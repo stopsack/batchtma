@@ -1,8 +1,0 @@
-url: https://stopsack.github.io/batchtma
-reference:
-- title: "Functions"
-  desc: >
-    Content of the `batchtma` package
-- contents:
-  - adjust_batch
-  - diagnose_models
