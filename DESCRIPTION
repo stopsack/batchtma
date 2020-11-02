@@ -1,0 +1,36 @@
+Package: batchtma
+Title: Batch effect adjustments
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Konrad",
+           family = "Stopsack",
+           role = c("aut", "cre"),
+           email = "stopsack@mskcc.org",
+           comment = c(ORCID = "0000-0002-0722-1311"))
+Description: This package provides different approaches to adjusting for
+  batch effects while addressing confounding between batches,
+  such as in data such as from tissue microarrays.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports:
+    broom (>= 0.7.0),
+    dplyr (>= 1.0.0),
+    geepack,
+    limma,
+    nnet,
+    purrr (>= 0.3.0),
+    quantreg,
+    rlang (>= 0.4.0),
+    stringr,
+    tibble,
+    tidyr (>= 1.1.0),
+    magrittr
+Suggests: 
+    knitr,
+    rmarkdown,
+    tidyverse
+VignetteBuilder: knitr
+URL: https://stopsack.github.io/batchtma, https://github.com/stopsack/batchtma
