@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Model diagnostics after batch adjustment — diagnose_models • batchtma</title>
+<title>Plot biomarkers by batch — plot_batch • batchtma</title>
 
 
 <!-- jquery -->
@@ -39,12 +39,16 @@
 
 
 
-<meta property="og:title" content="Model diagnostics after batch adjustment — diagnose_models" />
-<meta property="og:description" content="After adjust_batch has performed
-adjustment for batch effects, diagnose_models
-provides an overview of parameters and adjustment models.
-Information is only available about the most recent
-run of adjust_batch on a dataset." />
+<meta property="og:title" content="Plot biomarkers by batch — plot_batch" />
+<meta property="og:description" content="To provide a simple visualization of potential batch
+effects, plot_batch generates a Tukey
+box plot overlaid by a jittered
+dot plot, inspired by the Stata plugin stripplot.
+Boxes span from the 1st to the 3rd quartile; thick lines
+indicate medians; whiskers span up to 1.5 times the
+interquartile range; and asterisks indicate means.
+More powerful visualizations of batch effects exist
+in the BatchQC package, see references and links." />
 
 
 
@@ -124,122 +128,96 @@ run of adjust_batch on a dataset." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Model diagnostics after batch adjustment</h1>
-    <small class="dont-index">Source: <a href='https://github.com/stopsack/batchtma/blob/master/R/diagnose_models.R'><code>R/diagnose_models.R</code></a></small>
-    <div class="hidden name"><code>diagnose_models.Rd</code></div>
+    <h1>Plot biomarkers by batch</h1>
+    <small class="dont-index">Source: <a href='https://github.com/stopsack/batchtma/blob/master/R/plot_batch.R'><code>R/plot_batch.R</code></a></small>
+    <div class="hidden name"><code>plot_batch.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>After <code><a href='adjust_batch.html'>adjust_batch</a></code> has performed
-adjustment for batch effects, <code>diagnose_models</code>
-provides an overview of parameters and adjustment models.
-Information is only available about the most recent
-run of <code><a href='adjust_batch.html'>adjust_batch</a></code> on a dataset.</p>
+    <p>To provide a simple visualization of potential batch
+effects, <code>plot_batch</code> generates a Tukey
+box plot overlaid by a jittered
+dot plot, inspired by the Stata plugin <code>stripplot</code>.</p>
+<p>Boxes span from the 1st to the 3rd quartile; thick lines
+indicate medians; whiskers span up to 1.5 times the
+interquartile range; and asterisks indicate means.</p>
+<p>More powerful visualizations of batch effects exist
+in the BatchQC package, see references and links.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>diagnose_models</span><span class='op'>(</span><span class='va'>data</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>plot_batch</span><span class='op'>(</span><span class='va'>data</span>, <span class='va'>marker</span>, <span class='va'>batch</span>, color <span class='op'>=</span> <span class='cn'>NULL</span>, maxlevels <span class='op'>=</span> <span class='fl'>15</span>, <span class='va'>...</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>Batch-adjusted dataset</p></td>
+      <td><p>Dataset.</p></td>
+    </tr>
+    <tr>
+      <th>marker</th>
+      <td><p>Variable indicating the biomarker.</p></td>
+    </tr>
+    <tr>
+      <th>batch</th>
+      <td><p>Variable indicating the batch.</p></td>
+    </tr>
+    <tr>
+      <th>color</th>
+      <td><p>Optional: third variable to use for symbol
+color and shape. For example, <code>color</code> can be used
+to show differences in a confounder.</p></td>
+    </tr>
+    <tr>
+      <th>maxlevels</th>
+      <td><p>Optional: Maximum number of
+levels for <code>color</code> parameter to accept as a discrete
+variable, rather than a continuous variable.
+Defaults to <code>15</code>.</p></td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td><p>Optional: Passed on <code><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></code>.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>List:</p><ul>
-<li><p><code>adjust_method</code> Method used for batch adjustment
-(see <code><a href='adjust_batch.html'>adjust_batch</a></code>).</p></li>
-<li><p><code>markers</code> Variables of biomarkers for adjustment</p></li>
-<li><p><code>suffix</code> Suffix appended to variable names</p></li>
-<li><p><code>batchvar</code> Variable indicating batch</p></li>
-<li><p><code>confounders</code> Confounders, i.e. determinants of
-biomarker levels that differ between batches.
-Returned only if used by the model.</p></li>
-<li><p><code>adjust_parameters</code> Tibble of parameters used to
-obtain adjust biomarker levels. Parameters differ between
-methods. Note that <code>method = quantnorm</code> does not
-fit regression models and return parameters, and that
-<code>method = simple</code> only returns simple means
-as parameters and no regression models.</p></li>
-<li><p><code>model_fits</code> List of model fit objects, one
-per biomarker.</p></li>
-</ul>
+    <p>ggplot2 object, which can be further
+modified using standard ggplot2 functions. See examples.</p>
+    <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
+    <p>Cox NJ (2003). STRIPPLOT: Stata module for strip plots
+(one-way dot plots). Statistical Software Components
+S433401, Boston College Department of Economics,
+revised 11 Oct 2020.</p>
+<p>Manimaran S, Selby HM, Okrah K, Ruberman C, Leek JT,
+Quackenbush J, Haibe-Kains B, Bravo HC, Johnson WE (2016).
+BatchQC: interactive software for evaluating sample
+and batch effects in genomic data. Bioinformatics.
+doi:10.1093/bioinformatics/btw538</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p><a href='https://doi.org/10.1093/bioinformatics/btw538'>https://doi.org/10.1093/bioinformatics/btw538</a>
+<a href='http://bioconductor.org/packages/release/bioc/html/BatchQC.html'>http://bioconductor.org/packages/release/bioc/html/BatchQC.html</a></p></div>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'><span class='co'># Data frame with two batches</span>
-<span class='co'># Batch 2 has higher values of biomarker and confounder</span>
+    <pre class="examples"><div class='input'><span class='co'># Define example data</span>
 <span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>tma <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, times <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span>,
                  biomarker <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>2</span>, times <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span> <span class='op'>+</span>
                    <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span>max <span class='op'>=</span> <span class='fl'>5</span>, n <span class='op'>=</span> <span class='fl'>20</span><span class='op'>)</span>,
                  confounder <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/rep.html'>rep</a></span><span class='op'>(</span><span class='fl'>0</span><span class='op'>:</span><span class='fl'>1</span>, times <span class='op'>=</span> <span class='fl'>10</span><span class='op'>)</span> <span class='op'>+</span>
                    <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span>max <span class='op'>=</span> <span class='fl'>10</span>, n <span class='op'>=</span> <span class='fl'>20</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='co'># Adjust for batch effects</span>
-<span class='va'>df2</span> <span class='op'>&lt;-</span> <span class='fu'><a href='adjust_batch.html'>adjust_batch</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>df</span>, markers <span class='op'>=</span> <span class='va'>biomarker</span>,
-                    batch <span class='op'>=</span> <span class='va'>tma</span>, method <span class='op'>=</span> <span class='va'>quantreg</span>,
-                    confounders <span class='op'>=</span> <span class='va'>confounder</span><span class='op'>)</span>
-
-<span class='co'># Show overview of model diagnostics:</span>
-<span class='fu'>diagnose_models</span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>df2</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; Dataset after batch effect adjustment using 'method = quantreg'
-#&gt; Variable defining batches: tma
-#&gt; Adjusted variables: biomarker_adj5
-#&gt; Confounders: confounder
-#&gt; 
-#&gt; Estimated adjustment parameters:
-#&gt; <span style='color: #555555;'># A tibble: 2 x 10</span><span>
-#&gt;   .batchvar un_lo ad_lo un_hi ad_hi all_lo all_iq un_iq ad_iq marker   
-#&gt;   </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>     </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span>  </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;dbl&gt;</span><span> </span><span style='color: #555555;font-style: italic;'>&lt;chr&gt;</span><span>    
-#&gt; </span><span style='color: #555555;'>1</span><span> 1          1.87  1.49  4.40  4.27   3.43   1.94  2.53  2.78 biomarker
-#&gt; </span><span style='color: #555555;'>2</span><span> 2          3.95  3.79  5.83  6.36   3.43   1.94  1.88  2.57 biomarker
-#&gt; 
-#&gt; Models for adjustment:
-#&gt; [[1]]
-#&gt; [[1]][[1]]
-#&gt; Call:
-#&gt; quantreg::rq(formula = stats::as.formula(paste("variable ~ .batchvar", 
-#&gt;     confounders)), tau = tau, data = .x, method = "fn")
-#&gt; 
-#&gt; Coefficients:
-#&gt;               tau= 0.25 tau= 0.75
-#&gt; (Intercept)  1.89190459 3.2425575
-#&gt; .batchvar2   2.30394908 2.0915181
-#&gt; confounder  -0.06601737 0.1694321
-#&gt; 
-#&gt; Degrees of freedom: 20 total; 17 residual
-#&gt; 
-#&gt; </div><div class='input'>
-<span class='co'># Obtain first fitted regression model:</span>
-<span class='va'>fit</span> <span class='op'>&lt;-</span> <span class='fu'>diagnose_models</span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>df2</span><span class='op'>)</span><span class='op'>$</span><span class='va'>model_fits</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span><span class='op'>[[</span><span class='fl'>1</span><span class='op'>]</span><span class='op'>]</span>
-
-<span class='co'># Obtain residuals for this model:</span>
-<span class='fu'><a href='https://rdrr.io/r/stats/residuals.html'>residuals</a></span><span class='op'>(</span><span class='va'>fit</span><span class='op'>)</span>
-</div><div class='output co'>#&gt;           tau= 0.25     tau= 0.75
-#&gt;  [1,]  3.053685e+00 -2.398958e-01
-#&gt;  [2,]  5.451593e-01 -1.473216e+00
-#&gt;  [3,]  2.692821e+00  2.910365e-09
-#&gt;  [4,]  1.393218e+00 -7.709020e-01
-#&gt;  [5,] -1.814681e-02 -2.772697e+00
-#&gt;  [6,]  1.824600e+00 -7.423395e-12
-#&gt;  [7,]  3.582158e+00  5.384138e-12
-#&gt;  [8,]  3.181857e+00  5.309177e-01
-#&gt;  [9,]  4.320233e+00  1.687314e+00
-#&gt; [10,]  3.324465e-09 -2.029627e+00
-#&gt; [11,]  1.708929e+00 -6.934826e-01
-#&gt; [12,] -3.083656e-01 -2.556758e+00
-#&gt; [13,] -8.219478e-10 -1.416722e+00
-#&gt; [14,]  8.356639e-01 -1.635172e+00
-#&gt; [15,]  1.833769e+00 -4.352109e-01
-#&gt; [16,]  1.779953e+00  3.590384e-01
-#&gt; [17,]  3.778534e-01 -1.860376e+00
-#&gt; [18,]  1.806790e+00 -8.851936e-01
-#&gt; [19,] -2.746736e-08 -3.368652e+00
-#&gt; [20,] -1.047611e-01 -2.384465e+00</div></span></pre>
+<span class='co'># Visualize batch effects:</span>
+<span class='fu'>plot_batch</span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>df</span>, marker <span class='op'>=</span> <span class='va'>biomarker</span>,
+           batch <span class='op'>=</span> <span class='va'>tma</span>, color <span class='op'>=</span> <span class='va'>confounder</span><span class='op'>)</span>
+</div><div class='img'><img src='plot_batch-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'># Label y-axis, changing graph like other ggplots:</span>
+<span class='fu'>plot_batch</span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>df</span>, marker <span class='op'>=</span> <span class='va'>biomarker</span>,
+           batch <span class='op'>=</span> <span class='va'>tma</span>, color <span class='op'>=</span> <span class='va'>confounder</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>ggplot2</span><span class='fu'>::</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span>y <span class='op'>=</span> <span class='st'>"Biomarker (variable 'noisy')"</span><span class='op'>)</span>
+</div><div class='img'><img src='plot_batch-2.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

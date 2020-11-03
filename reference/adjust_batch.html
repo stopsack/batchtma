@@ -67,7 +67,7 @@ Generally, if batch effects are present, any adjustment
 method tends to perform better than no adjustment in
 reducing bias and increasing between-study reproducibility.
 See references.
-All adjustment approaches except method = quantnorm)
+All adjustment approaches except method = quantnorm
 are based on linear models. It is recommended that variables
 for markers and confounders first be transformed
 as necessary (e.g., log transformations or
@@ -126,13 +126,7 @@ support tidy evaluation." />
   </a>
   <ul class="dropdown-menu" role="menu">
     <li>
-      <a href="../articles/confounding.html">Advanced use: Batch effects and confounding</a>
-    </li>
-    <li>
       <a href="../articles/diagnostics.html">Advanced use: Model diagnostics</a>
-    </li>
-    <li>
-      <a href="../articles/methods.html">Advanced use: Different adjustment methods</a>
     </li>
   </ul>
 </li>
@@ -161,7 +155,7 @@ support tidy evaluation." />
   <div class="col-md-9 contents">
     <div class="page-header">
     <h1>Adjust for batch effects</h1>
-    <small class="dont-index">Source: <a href='https://github.com/stopsack/batchtma/blob/master/R/batchadjust.R'><code>R/batchadjust.R</code></a></small>
+    <small class="dont-index">Source: <a href='https://github.com/stopsack/batchtma/blob/master/R/adjust_batch.R'><code>R/adjust_batch.R</code></a></small>
     <div class="hidden name"><code>adjust_batch.Rd</code></div>
     </div>
 
@@ -193,7 +187,7 @@ Generally, if batch effects are present, any adjustment
 method tends to perform better than no adjustment in
 reducing bias and increasing between-study reproducibility.
 See references.</p>
-<p>All adjustment approaches except <code>method = quantnorm</code>)
+<p>All adjustment approaches except <code>method = quantnorm</code>
 are based on linear models. It is recommended that variables
 for <code>markers</code> and <code>confounders</code> first be transformed
 as necessary (e.g., <code><a href='https://rdrr.io/r/base/Log.html'>log</a></code> transformations or
