@@ -16,7 +16,9 @@ in factors that drive biomarker values (confounders).
 
 \code{\link[batchtma]{adjust_batch}}: Adjust for batch effects
 
-\code{\link[khsmisc]{diagnose_models}}: Model diagnostics after batch adjustment
+\code{\link[batchtma]{diagnose_models}}: Model diagnostics after batch adjustment
+
+\code{\link[batchtma]{plot_batch}}: Plot biomarkers by batch
 }
 
 \references{

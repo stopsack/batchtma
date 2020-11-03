@@ -12,6 +12,8 @@
 #'
 #' \code{\link[batchtma]{diagnose_models}}: Model diagnostics after batch adjustment
 #'
+#' \code{\link[batchtma]{plot_batch}}: Plot biomarkers by batch
+#'
 #' @docType package
 #' @name batchtma
 #' @seealso \url{https://stopsack.github.io/batchtma}

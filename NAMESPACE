@@ -3,6 +3,8 @@
 S3method(print,batchtma)
 export(adjust_batch)
 export(diagnose_models)
+export(plot_batch)
+importFrom(ggplot2,labs)
 importFrom(magrittr,"%>%")
 importFrom(rlang,":=")
 importFrom(rlang,.data)
