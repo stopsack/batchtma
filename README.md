@@ -75,18 +75,12 @@ adjustments.
 | 5  | `quantreg`    | Quantile regression           | Low/high quantiles, conditional | Yes                                      |
 | 6  | `quantnorm`   | Quantile normalization        | All quantiles                   | No                                       |
 
-  - [“Next steps (1): Different adjustment
-    methods”](articles/methods.html) shows general examples on the
-    different methods in absence of confounding.
+  - [“Get Started”](articles/batchtma.html) shows general examples on
+    the different methods in absence and presence of confounding.
 
-  - [“Next steps (2): Batch effects and
-    confounding”](articles/confounding.html) shows examples of how
-    addressing confounding can retain some of the “true” between-batch
-    differences.
-
-  - [“Next steps (3): Model diagnostics”](articles/diagnostics.html)
-    shows examples of how to inspect fit of the models used for batch
-    effect adjustment.
+  - [“Next steps: Model diagnostics”](articles/diagnostics.html) shows
+    examples of how to inspect fit of the models used for batch effect
+    adjustment.
 
 ## References
 

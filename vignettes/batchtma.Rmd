@@ -32,9 +32,9 @@ remotes::install_github("stopsack/batchtma", build_vignettes = TRUE)
 ```
 
 
-# Set up and plot toy data
+# Set up and plot example data
 
-We load the `batchtma` package and, for convenience with data handling and plotting, the `khsmisc` package:
+We load the `batchtma` package and, for convenience with data handling and plotting, the `tidyverse` package:
 
 ```{r, message = FALSE}
 library(batchtma)
@@ -61,28 +61,10 @@ df <- tibble(
 df
 ```
 
-We plot the biomarker values (*y*-axis) by batch (*x*-axis). Color/shape symbolizes which participant/tumor the measurements came from. Boxes span from the 25th to the 75th percentile (interquartile range); thick lines indicate medians; asterisks indicate means.
+We plot the biomarker values (*y*-axis) by batch (*x*-axis), using the `plot_batch` function. Color/shape symbolizes which participant/tumor the measurements came from. Boxes span from the 25th to the 75th percentile (interquartile range); thick lines indicate medians; asterisks indicate means.
 
 ```{r}
-plotbatch <- function(data, variable, color = "person") {
-  data %>% 
-    rename(var = one_of(variable),
-           colorvar = one_of(color)) %>%
-    ggplot(mapping = aes(x = batch, y = var)) +
-    geom_boxplot(outlier.shape = NA, color = "black") +
-    geom_jitter(width = 0.2, height = 0, 
-                mapping = aes(color = colorvar, shape = colorvar)) + 
-    scale_shape_manual(name = color, values = 15:30) + 
-    scale_color_viridis_d(name = color, option = "cividis") +
-    theme_minimal() +
-    theme(panel.grid.major.x = element_blank(),
-          axis.text = element_text(size = 10, color = "black")) +
-    labs(y = variable) +
-    stat_summary(geom = "point", fun = "mean", col = "black", 
-                 size = 5, shape = 8, stroke = 1, fill = "black")
-}
-
-df %>% plotbatch(variable = "noisy")
+df %>% plot_batch(marker = noisy, batch = batch, color = person)
 ```
 
 
@@ -98,21 +80,21 @@ df <- df %>%
            # Similarly, change mean value per batch, keeping overall mean the same:
            batchnum * 3 - mean(c(1, 5, 2, 3) * 3))
 
-df %>% plotbatch(variable = "noisy_batch")
+df %>% plot_batch(marker = noisy_batch, batch = batch, color = person)
 ```
 
 
-# Perform batch effect adjustment
+# Perform batch effect adjustment without confounders
 
 ## Simple means
 
-`method = simple` calculates the mean for each batch and subtracts the difference between this mean and the grand mean, such that all batches end up having a mean equivalent to the grand mean:
+`method = simple` calculates the mean for each batch and subtracts the difference between this mean and the grand mean, such that all batches end up having a mean equivalent to the grand mean. Differences in variance between batches will remain, if they exist (as in this example).
 
 ```{r}
 df %>% 
-  adjust_batch(markers = "noisy_batch", batch = "batch", 
-               method = "simple") %>%
-  plotbatch("noisy_batch_adj2")
+  adjust_batch(markers = noisy_batch, batch = batch, 
+               method = simple) %>%
+  plot_batch(marker = noisy_batch_adj2, batch = batch, color = person)
 ```
 
 
@@ -122,9 +104,9 @@ df %>%
 
 ```{r}
 df %>% 
-  adjust_batch(markers = "noisy_batch", batch = "batch", 
-               method = "standardize", confounders = "random") %>%
-  plotbatch("noisy_batch_adj3")
+  adjust_batch(markers = noisy_batch, batch = batch, 
+               method = standardize, confounders = random) %>%
+  plot_batch(marker = noisy_batch_adj3, batch = batch, color = person)
 ```
 
 
@@ -134,30 +116,74 @@ df %>%
 
 ```{r}
 df %>% 
-  adjust_batch(markers = "noisy_batch", batch = "batch", 
-               method = "ipw", confounders = "random") %>%
-  plotbatch("noisy_batch_adj4")
+  adjust_batch(markers = noisy_batch, batch = batch, 
+               method = ipw, confounders = random) %>%
+  plot_batch(marker = noisy_batch_adj4, batch = batch, color = person)
 ```
 
 
 ## Quantile regression
 
-`method = quantreg`, unlike the three preceding mean-only methods, addresses two distinct properties of batches: the "offset" values (a lower quantile), potentially reflective of background signal, and an inter-quantile range, potentially reflective of the dynamic range of the measurement.
+`method = quantreg`, unlike the three preceding mean-only methods, addresses two distinct properties of batches: the "offset" values (a lower quantile), potentially reflective of background signal, and an inter-quantile range, potentially reflective of the dynamic range of the measurement. By default, the first and third qua**r**tile are used.
 
 ```{r}
 df %>% 
-  adjust_batch(markers = "noisy_batch", batch = "batch", 
-               method = "quantreg", confounders = "random") %>%
-  plotbatch("noisy_batch_adj5")
+  adjust_batch(markers = noisy_batch, batch = batch, 
+               method = quantreg, confounders = random) %>%
+  plot_batch(marker = noisy_batch_adj5, batch = batch, color = person)
 ```
 
 ## Quantile normalization
 
+`method = quantnorm` performs quantile normalization: values are ranked within each batch, and then each rank is assigned the mean per rank across batches. Quantile normalization ensures that all batches have near-identical biomarker distributions. However, quantile normalization does not allow for accounting for `confounders`.
+
 ```{r}
 df %>% 
-  adjust_batch(markers = "noisy_batch", batch = "batch", 
-               method = "quantnorm") %>%
-  plotbatch("noisy_batch_adj6")
+  adjust_batch(markers = noisy_batch, batch = batch, 
+               method = quantnorm) %>%
+  plot_batch(marker = noisy_batch_adj6, batch = batch, color = person)
+```
+
+
+# Perform batch effect adjustment in the presence of confounding
+
+## Set up example data with confounding present
+
+```{r}
+set.seed(123)  # for reproducibility
+df <- df %>%
+  # Make confounder associated with batch
+  mutate(confounder = round(batchnum + runif(n = 200, max = 2)),
+         # Make biomarker values associated with confounder
+         noisy_conf = noisy + confounder * 3 - mean(confounder) * 3,
+         # Add batch effects to confounded biomarker values
+         noisy_conf_batch = noisy_conf * batchnum / mean(batchnum) + 
+           batchnum * 3 - mean(batchnum) * 3)
+
+df %>% plot_batch(marker = noisy_conf_batch, batch = batch, color = confounder)
+```
+
+
+## Batch effect adjustment ignoring confounding: Quantile regression
+
+```{r}
+df %>% 
+  adjust_batch(markers = noisy_conf_batch, batch = batch, 
+               method = quantnorm) %>%
+  plot_batch(marker = noisy_conf_batch_adj6, batch = batch, color = confounder)
+```
+
+## Means from marginal standardization
+
+## Inverse-probability weighting
+
+## Quantile regression
+
+```{r}
+df %>% 
+  adjust_batch(markers = noisy_conf_batch, batch = batch, 
+               method = quantreg, confounders = confounder) %>%
+  plot_batch(marker = noisy_conf_batch_adj5, batch = batch, color = confounder)
 ```
 
 # Additional features
