@@ -1,6 +1,6 @@
 Package: batchtma
 Title: Batch effect adjustments
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     person(given = "Konrad",
            family = "Stopsack",
@@ -9,7 +9,7 @@ Authors@R:
            comment = c(ORCID = "0000-0002-0722-1311"))
 Description: This package provides different approaches to adjusting for
   batch effects while addressing confounding between batches,
-  such as in data such as from tissue microarrays.
+  such as in data from tissue microarrays.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

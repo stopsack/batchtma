@@ -1,3 +1,3 @@
-# batchtma 0.0.0.9000
+# batchtma 0.1.0
 
-* Added a `NEWS.md` file to track changes to the package.
+* This is the first released version of batchtma.
