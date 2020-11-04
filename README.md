@@ -66,14 +66,14 @@ characteristics that are expected to lead to differences in biomarker
 levels. They should ideally be retained when performing batch effect
 adjustments.
 
-| \# | `method =`    | Approach                      | Addressed                       | Retains “true” between-batch differences |
-| -- | ------------- | ----------------------------- | ------------------------------- | ---------------------------------------- |
-| 1  | —             | Unadjusted                    | —                               | Yes                                      |
-| 2  | `simple`      | Simple means                  | Marginal means                  | No                                       |
-| 3  | `standardize` | Standardized batch means      | Conditional means               | Yes                                      |
-| 4  | `ipw`         | Inverse-probability weighting | Conditional means               | Yes                                      |
-| 5  | `quantreg`    | Quantile regression           | Low/high quantiles, conditional | Yes                                      |
-| 6  | `quantnorm`   | Quantile normalization        | All quantiles                   | No                                       |
+| \# | `method =`    | Approach                      | Addressed              | Retains “true” between-batch differences |
+| -- | ------------- | ----------------------------- | ---------------------- | ---------------------------------------- |
+| 1  | —             | Unadjusted                    | —                      | Yes                                      |
+| 2  | `simple`      | Simple means                  | Means                  | No                                       |
+| 3  | `standardize` | Standardized batch means      | Means                  | Yes                                      |
+| 4  | `ipw`         | Inverse-probability weighting | Means                  | Yes                                      |
+| 5  | `quantreg`    | Quantile regression           | Low and high quantiles | Yes                                      |
+| 6  | `quantnorm`   | Quantile normalization        | All ranks              | No                                       |
 
   - [“Get Started”](articles/batchtma.html) shows general examples on
     the different methods in absence and presence of confounding.
