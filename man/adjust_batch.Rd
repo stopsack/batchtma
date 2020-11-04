@@ -12,8 +12,7 @@ adjust_batch(
   confounders = NULL,
   suffix = "_adjX",
   truncate = c(0.025, 0.975),
-  tau = c(0.25, 0.75),
-  std = TRUE
+  tau = c(0.25, 0.75)
 )
 }
 \arguments{
@@ -74,8 +73,6 @@ weights at. Defaults to \code{c(0.025, 0.975)}.}
 
 \item{tau}{Optional and used for \code{method = quantreg} only:
 Quantiles to scale. Defaults to \code{c(0.25, 0.75)}.}
-
-\item{std}{INTERNAL- standardize quantreg?}
 }
 \value{
 The \code{data} dataset with batch effect-adjusted
