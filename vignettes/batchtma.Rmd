@@ -1,8 +1,8 @@
 ---
-title: "Methods to address batch effects"
+title: "Get Started: Methods to address batch effects"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Methods to address batch effects}
+  %\VignetteIndexEntry{Get Started: Methods to address batch effects}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 # Installation
 
-Currently, the development version of `batchtma` can be installed from
+Currently, the development version of batchtma can be installed from
 [GitHub](https://github.com/) using:
 
 ```{r, eval = FALSE}
@@ -34,7 +34,7 @@ remotes::install_github("stopsack/batchtma", build_vignettes = TRUE)
 
 # Set up and plot example data
 
-We load the `batchtma` package and, for convenience with data handling and plotting, the `tidyverse` package:
+We load the batchtma package and, for convenience with data handling and plotting, the tidyverse package:
 
 ```{r, message = FALSE}
 library(batchtma)
@@ -61,7 +61,7 @@ df <- tibble(
 df
 ```
 
-We plot the biomarker values (*y*-axis) by batch (*x*-axis), using the `plot_batch` function. Color/shape symbolizes which participant/tumor the measurements came from. Boxes span from the 25th to the 75th percentile (interquartile range); thick lines indicate medians; asterisks indicate means.
+We plot the biomarker values (*y*-axis) by batch (*x*-axis), using the `plot_batch()` function. Color/shape symbolizes which participant/tumor the measurements came from. Boxes span from the 25th to the 75th percentile (interquartile range); thick lines indicate medians; asterisks indicate means.
 
 ```{r}
 df %>% plot_batch(marker = noisy, batch = batch, color = person)
@@ -76,9 +76,9 @@ We add systematic differences between batches such that there is differential me
 df <- df %>%
   # Multiply by batch number to differentially change variance by batch,
   # divide by mean batch number to keep overall variance the same:
-  mutate(noisy_batch = noisy * batchnum / mean(c(1, 5, 2, 3)) + 
+  mutate(noisy_batch = noisy * batchnum / mean(batchnum) + 
            # Similarly, change mean value per batch, keeping overall mean the same:
-           batchnum * 3 - mean(c(1, 5, 2, 3) * 3))
+           batchnum * 3 - mean(batchnum) * 3)
 
 df %>% plot_batch(marker = noisy_batch, batch = batch, color = person)
 ```
@@ -124,7 +124,7 @@ df %>%
 
 ## Quantile regression
 
-`method = quantreg`, unlike the three preceding mean-only methods, addresses two distinct properties of batches: the "offset" values (a lower quantile), potentially reflective of background signal, and an inter-quantile range, potentially reflective of the dynamic range of the measurement. By default, the first and third qua**r**tile are used.
+`method = quantreg`, unlike the three preceding mean-only methods, addresses two distinct properties of batches: the "offset" values (a lower quantile), potentially reflective of background signal, and an inter-quantile range, potentially reflective of the "dynamic range" of the measurement. By default, the first and third qua**r**tile are used.
 
 ```{r}
 df %>% 
@@ -149,35 +149,66 @@ df %>%
 
 ## Set up example data with confounding present
 
+In general, confounding means that exposure and outcome share common causes. Necessary---but not sufficient---properties of a confounder are that it needs to be associated with the exposure (`batch`) and associated with the outcome(s) (`markers`). For example, if systematically higher biomarker values due to batch effects happen to occur in a tissue microarray with a higher proportion of aggressive tumors, then batch effect-adjusted biomarker values should account for the differences in proportions of aggressive tumors.
+
+In the example, a new variable for the biomarker is generated that is affected by both confounding and batch effects. First, biomarker values with random error, `noisy`, are forced to be associated with the `confounder`, which in turn is associated with `batch`. These values, `noisy_conf`, should be considered the new "ground truth."
+
+All following plots show color/symbol shape by `confounder`.
+
+
 ```{r}
 set.seed(123)  # for reproducibility
 df <- df %>%
-  # Make confounder associated with batch
+  # Make confounder associated with batch:
   mutate(confounder = round(batchnum + runif(n = 200, max = 2)),
-         # Make biomarker values associated with confounder
-         noisy_conf = noisy + confounder * 3 - mean(confounder) * 3,
-         # Add batch effects to confounded biomarker values
-         noisy_conf_batch = noisy_conf * batchnum / mean(batchnum) + 
+         # Make biomarker values associated with confounder:
+         noisy_conf = noisy + confounder * 3 - mean(confounder) * 3)
+
+df %>% plot_batch(marker = noisy_conf, batch = batch, color = confounder)
+```
+
+
+Second, batch effects for mean and variance are added.
+
+```{r}
+df <- df %>% 
+  # Add batch effects to confounded biomarker values:
+  mutate(noisy_conf_batch = noisy_conf * batchnum / mean(batchnum) + 
            batchnum * 3 - mean(batchnum) * 3)
 
 df %>% plot_batch(marker = noisy_conf_batch, batch = batch, color = confounder)
 ```
 
+The following examples show to what extent batch effects can be removed from `noisy_conf_batch` to recover the "ground truth," `noisy_conf`.
 
-## Batch effect adjustment ignoring confounding: Quantile regression
+
+## Means from marginal standardization
+
+`method = standardize` reduces batch effects while allowing batch means to differ because of the confounder. Batches with higher "true" biomarker values associated with the confounder, like batch B, retain higher means after batch effect adjustment.
 
 ```{r}
 df %>% 
   adjust_batch(markers = noisy_conf_batch, batch = batch, 
-               method = quantnorm) %>%
-  plot_batch(marker = noisy_conf_batch_adj6, batch = batch, color = confounder)
+               method = standardize, confounders = confounder) %>%
+  plot_batch(marker = noisy_conf_batch_adj3, batch = batch, color = confounder)
 ```
 
-## Means from marginal standardization
 
 ## Inverse-probability weighting
 
+`method = ipw` also reduces batch effects while allowing batch means to differ because of the confounder. As with marginal standardization, differences in variance between batches are not addressed.
+
+```{r}
+df %>% 
+  adjust_batch(markers = noisy_conf_batch, batch = batch, 
+               method = ipw, confounders = confounder) %>%
+  plot_batch(marker = noisy_conf_batch_adj4, batch = batch, color = confounder)
+```
+
+
 ## Quantile regression
+
+`method = quantreg` reduces for batch effects of "offset" and "dynamic range" separately, accounting for differences in confounders. In the example, batch B with its high levels of the confounder retains somewhat higher values and a higher variance, unlike with the two preceding mean-only methods.
 
 ```{r}
 df %>% 
@@ -186,8 +217,75 @@ df %>%
   plot_batch(marker = noisy_conf_batch_adj5, batch = batch, color = confounder)
 ```
 
+
+## For comparison: Batch effect adjustment ignoring confounding
+
+### Simple means
+
+`method = simple` leads to all batches having the same mean after adjustment. In the example, this method ignores that batch B should have higher values because of higher values of the confounder.
+
+```{r}
+df %>% 
+  adjust_batch(markers = noisy_conf_batch, batch = batch, 
+               method = simple, confounders = confounder) %>%
+  plot_batch(marker = noisy_conf_batch_adj2, batch = batch, color = confounder)
+```
+
+
+### Quantile regression
+
+`method = quantreg` also ignores the confounder.
+
+```{r}
+df %>% 
+  adjust_batch(markers = noisy_conf_batch, batch = batch, 
+               method = quantnorm, confounders = confounder) %>%
+  plot_batch(marker = noisy_conf_batch_adj6, batch = batch, color = confounder)
+```
+
+
 # Additional features
 
 ## Missing values
 
-`batchtma` can also handle missing biomarker values, which is a common phenomenon in tissue microarray studies. This situation is different from gene expression studies, where measured genes are typically measured on all batches (*e.g.*, microarrays). No coding changes are needed.
+batchtma can handle missing biomarker values, which is a common phenomenon in tissue microarray studies. This situation is different from gene expression studies, where measured genes are typically measured on all batches (*e.g.*, microarrays). No coding changes are needed. If multiple biomarkers are batch-adjusted with one call of `adjust_batch(markers = c(biomarker_a, biomarker_b, biomarker_c), ...)` and different rows (e.g., tumors) have missing values for different columns (biomarkers), no values will be excluded because of missingness in another marker.
+
+
+## Model diagnostics
+
+When running `adjust_batch()`, the dataset is returned with the batch effect-adjusted variables added at the end. Yet what did `adjust_batch()` do and how well did the methods used for batch effect correction fit to the data that they were applied to? Adjustment for batch effects relies on regression models for methods `standardize`, `ipw`, and `quantreg`; in addition, `method = simple` estimates means per batch. 
+
+The `diagnose_models()` function provides an overview of what `adjust_batch()` did, shows overview of the adjustment models, and provides access to detailed model diagnostics.
+
+To obtain an overview of model diagnostics, `diagnose_models()` is called on the return values of `adjust_batch()`:
+
+```{r}
+# df2 is the new dataset that also contains "noisy_conf_batch_adj2":
+df2 <- df %>% adjust_batch(markers = noisy_conf_batch, batch = batch, 
+                           method = standardize, confounders = confounder)
+
+# Show overview of model diagnostics:
+diagnose_models(df2)
+```
+
+In this example, `method = standardize` fits a linear regression model with batch and confounders as exposure and the unadjusted biomarker as the outcome. This model can be extracted directly from `diagnose_models()`:
+```{r}
+fit <- diagnose_models(data = df2)$model_fits[[1]][[1]]
+summary(fit)
+```
+
+The marginally standardized means per batch are the adjustment parameters estimates by this procedure. They are returned by `diagnose_models()` as `adjust_parameters`:
+
+```{r}
+diagnose_models(df2)$adjust_parameters
+```
+
+Diagnostics for regresion models can be performed on fitted models just as for any other regression model in R. For example, residuals *vs.* fitted can be plotted:
+
+```{r}
+tibble(fitted    = fitted.values(fit),
+       residuals = residuals(fit)) %>%
+  ggplot(mapping = aes(x = fitted, y = residuals)) +
+  geom_point() +
+  theme_minimal()
+```

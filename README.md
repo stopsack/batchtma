@@ -1,13 +1,13 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# `batchtma` R package: Methods to address batch effects
+# batchtma R package: Methods to address batch effects
 
 <!-- badges: start -->
 
 <!-- badges: end -->
 
-The goal of the `batchtma` is to provide functions for batch
+The goal of the batchtma package is to provide functions for batch
 effect-adjusting biomarker data. It implements different methods that
 address batch effects while retaining differences between batches that
 may be due to “true” underlying differences in factors that drive
@@ -15,7 +15,7 @@ biomarker values.
 
 ## Installation
 
-Currently, the development version of `batchtma` can be installed from
+Currently, the development version of batchtma can be installed from
 [GitHub](https://github.com/) using:
 
 ``` r
@@ -46,7 +46,7 @@ df <- data.frame(batch = rep(1:2, times = 25),
                  biomarker = rep(c(2, 2.5, 3, 5, 6), each = 10) + runif(max = 5, n = 50))
 ```
 
-Run the `adjust_batch` function to adjust for batch effects:
+Run the `adjust_batch()` function to adjust for batch effects:
 
 ``` r
 adjust_batch(data = df, markers = biomarker, batch = batch, method = simple)
@@ -77,10 +77,6 @@ adjustments.
 
   - [“Get Started”](articles/batchtma.html) shows general examples on
     the different methods in absence and presence of confounding.
-
-  - [“Next steps: Model diagnostics”](articles/diagnostics.html) shows
-    examples of how to inspect fit of the models used for batch effect
-    adjustment.
 
 ## References
 
