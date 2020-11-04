@@ -177,6 +177,7 @@ batchmean_ipw <- function(data, markers, confounders,
                     confounders = paste(confounders, sep = " + ", collapse = " + "))
 }
 
+
 #' Quantiles for approach 5: Quantile regression
 #'
 #' @param data Data set
@@ -187,60 +188,6 @@ batchmean_ipw <- function(data, markers, confounders,
 #' @return Tibble of quantiles per batch
 #' @noRd
 batchrq <- function(data, variable, confounders, tau) {
-  variable <- dplyr::enquo(variable)
-  res <- data %>%
-    dplyr::rename(variable = !!variable) %>%
-    dplyr::filter(!is.na(.data$variable)) %>%
-    tidyr::nest(data = dplyr::everything()) %>%
-    dplyr::mutate(
-      un = purrr::map(.x = .data$data,
-                      .f = ~quantreg::rq(formula = variable ~ .batchvar,
-                                         data = .x, tau = tau, method = "fn")),
-      ad = purrr::map(.x = .data$data,
-                      .f = ~quantreg::rq(formula = stats::as.formula(
-                        paste("variable ~ .batchvar", confounders)),
-                        data = .x, tau = tau, method = "fn")))
-
-  values <- res %>%
-    dplyr::mutate_at(.vars = dplyr::vars(.data$un, .data$ad),
-                     .funs = ~purrr::map(.x = .x, .f = stats::predict)) %>%
-    dplyr::mutate(un = purrr::map(.x = .data$un,
-                                  .f = tibble::as_tibble,
-                                  .name_repair = ~c("un_lo", "un_hi")),
-                  ad = purrr::map(.x = .data$ad,
-                                  .f = tibble::as_tibble,
-                                  .name_repair = ~c("ad_lo", "ad_hi"))) %>%
-    tidyr::unnest(cols = c(.data$data, .data$un, .data$ad)) %>%
-    dplyr::select(.data$variable, .data$un_lo, .data$ad_lo,
-                  .data$un_hi, .data$ad_hi, .data$.batchvar) %>%
-    dplyr::mutate(all_lo = stats::quantile(.data$variable, probs = 0.25),
-                  all_hi = stats::quantile(.data$variable, probs = 0.75),
-                  all_iq = .data$all_hi - .data$all_lo) %>%
-    dplyr::group_by(.data$.batchvar) %>%
-    dplyr::summarize(un_lo  = stats::quantile(.data$un_lo, probs = 0.25),
-                     ad_lo  = stats::quantile(.data$ad_lo, probs = 0.25),
-                     un_hi  = stats::quantile(.data$un_hi, probs = 0.75),
-                     ad_hi  = stats::quantile(.data$ad_hi, probs = 0.75),
-                     all_lo = stats::median(.data$all_lo),
-                     all_iq = stats::median(.data$all_iq)) %>%
-    dplyr::mutate(un_iq  = .data$un_hi - .data$un_lo,
-                  ad_iq  = .data$ad_hi - .data$ad_lo,
-                  marker = !!variable)
-
-  models <- res %>% dplyr::pull(.data$ad)
-  return(tibble::lst(values, models))
-}
-
-#' Quantiles for approach 5: Quantile regression, STANDARDIZED
-#'
-#' @param data Data set
-#' @param variable Single variable to batch-adjust
-#' @param confounders Confounders: features that differ
-#' @param tau Quantiles to use for scaling
-#'
-#' @return Tibble of quantiles per batch
-#' @noRd
-batchrq_std <- function(data, variable, confounders, tau) {
   variable <- dplyr::enquo(variable)
   res <- data %>%
     dplyr::rename(variable = !!variable) %>%
@@ -407,7 +354,6 @@ batch_quantnorm <- function(var, batch) {
 #'   weights at. Defaults to \code{c(0.025, 0.975)}.
 #' @param tau Optional and used for \code{method = quantreg} only:
 #'   Quantiles to scale. Defaults to \code{c(0.25, 0.75)}.
-#' @param std INTERNAL- standardize quantreg?
 #'
 #' @return The \code{data} dataset with batch effect-adjusted
 #'   variable(s) added at the end. Model diagnostics, using
@@ -466,8 +412,7 @@ adjust_batch <- function(data, markers, batch,
                          confounders = NULL,
                          suffix = "_adjX",
                          truncate = c(0.025, 0.975),
-                         tau = c(0.25, 0.75),
-                         std = TRUE) {
+                         tau = c(0.25, 0.75)) {
   method <- as.character(dplyr::enexpr(method))
   allmethods <- c("simple", "standardize", "ipw", "quantreg", "quantnorm")
   markers     <- dplyr::enquo(markers)
@@ -536,7 +481,7 @@ adjust_batch <- function(data, markers, batch,
   if(method == "quantreg") {
     res <- purrr::map(
       .x = data %>% dplyr::select(!!markers) %>% names(),
-      .f = if(std) batchrq_std else batchrq,
+      .f = batchrq,
       data        = data,
       confounders = dplyr::if_else(confounders != "",
                                    true  = paste0("+ ",
