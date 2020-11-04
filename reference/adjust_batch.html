@@ -106,7 +106,7 @@ support tidy evaluation." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">batchtma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
       </span>
     </div>
 
@@ -193,8 +193,7 @@ support tidy evaluation.</p>
   confounders <span class='op'>=</span> <span class='cn'>NULL</span>,
   suffix <span class='op'>=</span> <span class='st'>"_adjX"</span>,
   truncate <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.025</span>, <span class='fl'>0.975</span><span class='op'>)</span>,
-  tau <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.25</span>, <span class='fl'>0.75</span><span class='op'>)</span>,
-  std <span class='op'>=</span> <span class='cn'>TRUE</span>
+  tau <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.25</span>, <span class='fl'>0.75</span><span class='op'>)</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -271,10 +270,6 @@ weights at. Defaults to <code><a href='https://rdrr.io/r/base/c.html'>c(0.025, 0
       <th>tau</th>
       <td><p>Optional and used for <code>method = quantreg</code> only:
 Quantiles to scale. Defaults to <code><a href='https://rdrr.io/r/base/c.html'>c(0.25, 0.75)</a></code>.</p></td>
-    </tr>
-    <tr>
-      <th>std</th>
-      <td><p>INTERNAL- standardize quantreg?</p></td>
     </tr>
     </table>
 
