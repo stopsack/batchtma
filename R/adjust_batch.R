@@ -23,7 +23,7 @@ batchmean_simple <- function(data, markers) {
     tidyr::pivot_longer(col = c(-.data$.batchvar),
                         names_to = "marker",
                         values_to = "batchmean")
-  return(list(values = values, models = NULL))
+  return(list(list(values = values, models = NULL)))
 }
 
 #' Batch means for approach 3: Marginal standardization
@@ -72,8 +72,8 @@ batchmean_standardize <- function(data, markers, confounders) {
     dplyr::transmute(marker = .data$marker,
                      .batchvar = .data$.batchvar,
                      batchmean = .data$batchmean - .data$markermean)
-  return(list(values = values,
-              models = list(models = res %>% dplyr::ungroup() %>% dplyr::pull("model"))))
+  return(list(list(models = res %>% dplyr::ungroup() %>% dplyr::pull("model"),
+                   values = values)))
 }
 
 #' Batch means for approach 4: IPW
@@ -171,12 +171,10 @@ batchmean_ipw <- function(data, markers, confounders,
     list(values = values, models = res %>% dplyr::pull(.data$den))
   }
 
-  res <- purrr::map(.x = data %>% dplyr::select(!!markers) %>% names(),
-             .f = ipwbatch,
-             data = data, truncate = truncate,
-             confounders = paste(confounders, sep = " + ", collapse = " + "))
-  list(values = purrr::map_dfr(.x = res, .f = ~purrr::pluck(.x, "values")),
-       models = res$models)
+  purrr::map(.x = data %>% dplyr::select(!!markers) %>% names(),
+                    .f = ipwbatch,
+                    data = data, truncate = truncate,
+                    confounders = paste(confounders, sep = " + ", collapse = " + "))
 }
 
 #' Quantiles for approach 5: Quantile regression
@@ -518,7 +516,7 @@ adjust_batch <- function(data, markers, batch,
                                             confounders = confounders),
       "ipw"    = batchmean_ipw(   data = data, markers = !!markers,
                                   confounders = confounders))
-    adjust_parameters <- purrr::pluck(.x = res, "values")
+    adjust_parameters <- purrr::map_dfr(.x = res, .f = ~purrr::pluck(.x, "values"))
     method_indices <- c("simple" = 2, "standardize" = 3, "ipw" = 4)
     if(suffix == "_adjX")
       suffix <- paste0("_adj", method_indices[method[1]])
