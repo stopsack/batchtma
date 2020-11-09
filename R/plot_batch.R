@@ -10,9 +10,6 @@
 #' indicate medians; whiskers span up to 1.5 times the
 #' interquartile range; and asterisks indicate means.
 #'
-#' More powerful visualizations of batch effects exist
-#' in the BatchQC package, see references and links.
-#'
 #' @param data Dataset.
 #' @param marker Variable indicating the biomarker.
 #' @param batch Variable indicating the batch.
@@ -23,7 +20,7 @@
 #'   levels for \code{color} parameter to accept as a discrete
 #'   variable, rather than a continuous variable.
 #'   Defaults to \code{15}.
-#' @param ... Optional: Passed on \code{\link[ggplot2]{ggplot}}.
+#' @param ... Optional: Passed on to \code{\link[ggplot2]{ggplot}}.
 #'
 #' @return ggplot2 object, which can be further
 #'   modified using standard ggplot2 functions. See examples.
@@ -43,7 +40,11 @@
 #' doi:10.1093/bioinformatics/btw538
 #'
 #' @seealso
+#' More powerful visualizations of batch effects exist
+#' in the BatchQC package:
+#'
 #' \url{https://doi.org/10.1093/bioinformatics/btw538}
+#'
 #' \url{http://bioconductor.org/packages/release/bioc/html/BatchQC.html}
 #'
 #' @examples

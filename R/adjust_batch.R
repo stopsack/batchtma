@@ -2,6 +2,22 @@
 ## quiets concerns of R CMD check re: the .'s that appear in pipelines
 if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
 
+#' Drop empty factor levels
+#'
+#' @description
+#' Avoids predict() issues. This is \code{forcats::fct_drop()}
+#' without bells and whistles.
+#'
+#' @param f factor
+#'
+#' @return Factor
+#' @noRd
+factor_drop <- function(f) {
+  factor_levels <- levels(f)
+  factor(f, levels = setdiff(factor_levels, factor_levels[table(f) == 0]))
+}
+
+
 #' Batch means for approach 2: Unadjusted means
 #'
 #' @param data Data set
@@ -42,6 +58,7 @@ batchmean_standardize <- function(data, markers, confounders) {
                         names_to = "marker",
                         values_to = "value") %>%
     dplyr::filter(!is.na(.data$value)) %>%
+    dplyr::mutate(.batchvar = factor_drop(.batchvar)) %>%
     dplyr::group_by(.data$marker) %>%
     tidyr::nest(data = c(-.data$marker)) %>%
     dplyr::mutate(
@@ -65,7 +82,7 @@ batchmean_standardize <- function(data, markers, confounders) {
     dplyr::select(.data$marker, .data$.batchvar, .data$pred) %>%
     tidyr::unnest(cols = .data$pred) %>%
     dplyr::group_by(.data$marker, .data$.batchvar) %>%
-    dplyr::summarize(batchmean = mean(.data$pred)) %>%
+    dplyr::summarize(batchmean = mean(.data$pred, na.rm = TRUE)) %>%
     dplyr::group_by(.data$marker) %>%
     dplyr::mutate(markermean = mean(.data$batchmean)) %>%
     dplyr::ungroup() %>%
@@ -90,9 +107,12 @@ batchmean_ipw <- function(data, markers, confounders,
                           truncate = c(0.025, 0.975)) {
   markers <- dplyr::enquo(markers)
   ipwbatch <- function(data, variable, confounders, truncate) {
-    res <- data %>%
+    data <- data %>%
       dplyr::rename(variable = dplyr::one_of(variable)) %>%
       dplyr::filter(!is.na(.data$variable)) %>%
+      dplyr::mutate(.batchvar = factor_drop(.batchvar))
+
+    res <- data %>%
       tidyr::nest(data = dplyr::everything()) %>%
       dplyr::mutate(
         num = purrr::map(.x = .data$data,
@@ -125,7 +145,7 @@ batchmean_ipw <- function(data, markers, confounders,
                                                    true = 1 - .data$value,
                                                    false = .data$value)) %>%
                                                dplyr::pull(.data$probs)))
-    # otherwise probabilities are a data frame
+      # otherwise probabilities are a data frame
     } else {
       values <- values %>%
         dplyr::mutate_at(.vars = dplyr::vars(.data$num, .data$den),
@@ -152,8 +172,8 @@ batchmean_ipw <- function(data, markers, confounders,
     xlev <- unique(data %>% dplyr::pull(.data$.batchvar))
 
     values <- geepack::geeglm(formula = variable ~ .batchvar,
-                    data = values, weights = values$trunc,
-                    id = values$.id, corstr = "independence") %>%
+                              data = values, weights = values$trunc,
+                              id = values$.id, corstr = "independence") %>%
       broom::tidy() %>%
       dplyr::filter(!stringr::str_detect(string = .data$term,
                                          pattern = "(Intercept)")) %>%
@@ -172,9 +192,11 @@ batchmean_ipw <- function(data, markers, confounders,
   }
 
   purrr::map(.x = data %>% dplyr::select(!!markers) %>% names(),
-                    .f = ipwbatch,
-                    data = data, truncate = truncate,
-                    confounders = paste(confounders, sep = " + ", collapse = " + "))
+             .f = ipwbatch,
+             data = data %>%
+               dplyr::filter(dplyr::across(all_of(confounders), ~!is.na(.x))),
+             truncate = truncate,
+             confounders = paste(confounders, sep = " + ", collapse = " + "))
 }
 
 
@@ -192,6 +214,7 @@ batchrq <- function(data, variable, confounders, tau) {
   res <- data %>%
     dplyr::rename(variable = !!variable) %>%
     dplyr::filter(!is.na(.data$variable)) %>%
+    dplyr::mutate(.batchvar = factor_drop(.batchvar)) %>%
     tidyr::nest(data = dplyr::everything()) %>%
     dplyr::mutate(
       un = purrr::map(.x = .data$data,
@@ -273,41 +296,6 @@ batch_quantnorm <- function(var, batch) {
 #' (adjusted) for batch effects, i.e. differential measurement
 #' error between levels of \code{batch}.
 #'
-#' If no true differences between batches are expected, because
-#' samples have been randomized to batches, then a \code{method}
-#' that returns adjusted values with equal means
-#' (\code{method = simple}) or with equal rank values
-#' (\code{method = quantnorm}) for all batches is appropriate.
-#'
-#' If the distribution of determinants of biomarker values
-#' (\code{confounders}) differs between batches, then a
-#' \code{method} that retains these "true" differences
-#' between batches while adjusting for batch effects
-#' may be appropriate: \code{method = standardize} and
-#' \code{method = ipw} address means; \code{method = quantreg}
-#' addresses lower values and dynamic range separately.
-#'
-#' Which \code{method} to choose depends on the properties of
-#' batch effects (affecting means or also variance?) and
-#' the presence and strength of confounding. For the two
-#' mean-only confounder-adjusted methods, the choice may depend
-#' on  whether the confounder--batch association (\code{method = ipw})
-#' or the confounder--biomarker association
-#' (\code{method = standardize}) can be modeled better.
-#' Generally, if batch effects are present, any adjustment
-#' method tends to perform better than no adjustment in
-#' reducing bias and increasing between-study reproducibility.
-#' See references.
-#'
-#' All adjustment approaches except \code{method = quantnorm}
-#' are based on linear models. It is recommended that variables
-#' for \code{markers} and \code{confounders} first be transformed
-#' as necessary (e.g., \code{\link[base]{log}} transformations or
-#' \code{\link{splines}}). Scaling or mean centering are not necessary,
-#' and adjusted values are returned on the original scale.
-#' Parameters \code{markers}, \code{batch}, and \code{confounders}
-#' support tidy evaluation.
-#'
 #' @param data Data set
 #' @param markers Variable name(s) to batch-adjust. Select
 #'   multiple variables with tidy evaluation, e.g.,
@@ -354,6 +342,49 @@ batch_quantnorm <- function(var, batch) {
 #'   weights at. Defaults to \code{c(0.025, 0.975)}.
 #' @param tau Optional and used for \code{method = quantreg} only:
 #'   Quantiles to scale. Defaults to \code{c(0.25, 0.75)}.
+#'
+#' @details
+#' If no true differences between batches are expected, because
+#' samples have been randomized to batches, then a \code{method}
+#' that returns adjusted values with equal means
+#' (\code{method = simple}) or with equal rank values
+#' (\code{method = quantnorm}) for all batches is appropriate.
+#'
+#' If the distribution of determinants of biomarker values
+#' (\code{confounders}) differs between batches, then a
+#' \code{method} that retains these "true" differences
+#' between batches while adjusting for batch effects
+#' may be appropriate: \code{method = standardize} and
+#' \code{method = ipw} address means; \code{method = quantreg}
+#' addresses lower values and dynamic range separately.
+#'
+#' Which \code{method} to choose depends on the properties of
+#' batch effects (affecting means or also variance?) and
+#' the presence and strength of confounding. For the two
+#' mean-only confounder-adjusted methods, the choice may depend
+#' on  whether the confounder--batch association (\code{method = ipw})
+#' or the confounder--biomarker association
+#' (\code{method = standardize}) can be modeled better.
+#' Generally, if batch effects are present, any adjustment
+#' method tends to perform better than no adjustment in
+#' reducing bias and increasing between-study reproducibility.
+#' See references.
+#'
+#' All adjustment approaches except \code{method = quantnorm}
+#' are based on linear models. It is recommended that variables
+#' for \code{markers} and \code{confounders} first be transformed
+#' as necessary (e.g., \code{\link[base]{log}} transformations or
+#' \code{\link{splines}}). Scaling or mean centering are not necessary,
+#' and adjusted values are returned on the original scale.
+#' Parameters \code{markers}, \code{batch}, and \code{confounders}
+#' support tidy evaluation.
+#'
+#' Observations with missing values for the \code{markers} and
+#' \code{confounders} will be ignored in the estimation of adjustment
+#' parameters, as are empty batches. Batch effect-adjusted values
+#' for observations with existing marker values but missing
+#' confounders are based on adjustment parameters derived from the
+#' other observations in a batch with non-missing confounders.
 #'
 #' @return The \code{data} dataset with batch effect-adjusted
 #'   variable(s) added at the end. Model diagnostics, using
@@ -422,7 +453,8 @@ adjust_batch <- function(data, markers, batch,
     dplyr::mutate(.id = dplyr::row_number())
   data <- data_orig %>%
     dplyr::rename(.batchvar = !!batch) %>%
-    dplyr::mutate(.batchvar = factor(.data$.batchvar)) %>%
+    dplyr::mutate(.batchvar = factor(.data$.batchvar),
+                  .batchvar = factor_drop(.data$.batchvar)) %>%
     dplyr::select(.data$.id, .data$.batchvar, !!markers, !!confounders)
   confounders <- data %>% dplyr::select(!!confounders) %>% names()
 
@@ -482,7 +514,8 @@ adjust_batch <- function(data, markers, batch,
     res <- purrr::map(
       .x = data %>% dplyr::select(!!markers) %>% names(),
       .f = batchrq,
-      data        = data,
+      data        = data %>%
+        dplyr::filter(dplyr::across(all_of(confounders), ~!is.na(.x))),
       confounders = dplyr::if_else(confounders != "",
                                    true  = paste0("+ ",
                                                   paste(confounders,

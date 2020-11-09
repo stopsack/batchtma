@@ -50,13 +50,13 @@ library(batchtma)
 
 Define example data with batch effects:
 ```{r}
-df <- data.frame(batch = rep(1:2, times = 25),
-                 biomarker = rep(c(2, 2.5, 3, 5, 6), each = 10) + runif(max = 5, n = 50))
+df <- data.frame(tma = rep(1:2, times = 10),
+                 biomarker = rep(1:2, times = 10) + runif(max = 5, n = 20))
 ```
 
 Run the `adjust_batch()` function to adjust for batch effects:
 ```{r}
-adjust_batch(data = df, markers = biomarker, batch = batch, method = simple)
+adjust_batch(data = df, markers = biomarker, batch = tma, method = simple)
 ```
 
 * The ["Get Started"](articles/batchtma.html) vignette has details on how to use the package. 

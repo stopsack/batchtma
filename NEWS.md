@@ -1,6 +1,10 @@
+# batchtma 0.1.2
+
+* Consistently allow for missing biomarker and confounder values as well as empty batches.
+
 # batchtma 0.1.1
 
-* Remove old version of quantile regression without standardization
+* Remove old version of quantile regression without standardization.
 
 
 # batchtma 0.1.0

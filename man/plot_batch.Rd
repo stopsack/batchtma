@@ -22,7 +22,7 @@ levels for \code{color} parameter to accept as a discrete
 variable, rather than a continuous variable.
 Defaults to \code{15}.}
 
-\item{...}{Optional: Passed on \code{\link[ggplot2]{ggplot}}.}
+\item{...}{Optional: Passed on to \code{\link[ggplot2]{ggplot}}.}
 }
 \value{
 ggplot2 object, which can be further
@@ -37,9 +37,6 @@ dot plot, inspired by the Stata plugin \code{stripplot}.
 Boxes span from the 1st to the 3rd quartile; thick lines
 indicate medians; whiskers span up to 1.5 times the
 interquartile range; and asterisks indicate means.
-
-More powerful visualizations of batch effects exist
-in the BatchQC package, see references and links.
 }
 \examples{
 # Define example data
@@ -71,6 +68,10 @@ and batch effects in genomic data. Bioinformatics.
 doi:10.1093/bioinformatics/btw538
 }
 \seealso{
+More powerful visualizations of batch effects exist
+in the BatchQC package:
+
 \url{https://doi.org/10.1093/bioinformatics/btw538}
+
 \url{http://bioconductor.org/packages/release/bioc/html/BatchQC.html}
 }

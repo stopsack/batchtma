@@ -85,7 +85,8 @@ via the \code{\link[batchtma]{diagnose_models}} function.
 \code{markers} in the dataset \code{data} that are corrected
 (adjusted) for batch effects, i.e. differential measurement
 error between levels of \code{batch}.
-
+}
+\details{
 If no true differences between batches are expected, because
 samples have been randomized to batches, then a \code{method}
 that returns adjusted values with equal means
@@ -120,6 +121,13 @@ as necessary (e.g., \code{\link[base]{log}} transformations or
 and adjusted values are returned on the original scale.
 Parameters \code{markers}, \code{batch}, and \code{confounders}
 support tidy evaluation.
+
+Observations with missing values for the \code{markers} and
+\code{confounders} will be ignored in the estimation of adjustment
+parameters, as are empty batches. Batch effect-adjusted values
+for observations with existing marker values but missing
+confounders are based on adjustment parameters derived from the
+other observations in a batch with non-missing confounders.
 }
 \examples{
 # Data frame with two batches
