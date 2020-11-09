@@ -43,38 +43,7 @@
 <meta property="og:description" content="adjust_batch generates biomarker levels for the variable(s)
 markers in the dataset data that are corrected
 (adjusted) for batch effects, i.e. differential measurement
-error between levels of batch.
-If no true differences between batches are expected, because
-samples have been randomized to batches, then a method
-that returns adjusted values with equal means
-(method = simple) or with equal rank values
-(method = quantnorm) for all batches is appropriate.
-If the distribution of determinants of biomarker values
-(confounders) differs between batches, then a
-method that retains these &quot;true&quot; differences
-between batches while adjusting for batch effects
-may be appropriate: method = standardize and
-method = ipw address means; method = quantreg
-addresses lower values and dynamic range separately.
-Which method to choose depends on the properties of
-batch effects (affecting means or also variance?) and
-the presence and strength of confounding. For the two
-mean-only confounder-adjusted methods, the choice may depend
-on  whether the confounder--batch association (method = ipw)
-or the confounder--biomarker association
-(method = standardize) can be modeled better.
-Generally, if batch effects are present, any adjustment
-method tends to perform better than no adjustment in
-reducing bias and increasing between-study reproducibility.
-See references.
-All adjustment approaches except method = quantnorm
-are based on linear models. It is recommended that variables
-for markers and confounders first be transformed
-as necessary (e.g., log transformations or
-splines). Scaling or mean centering are not necessary,
-and adjusted values are returned on the original scale.
-Parameters markers, batch, and confounders
-support tidy evaluation." />
+error between levels of batch." />
 
 
 
@@ -106,7 +75,7 @@ support tidy evaluation." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">batchtma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.2</span>
       </span>
     </div>
 
@@ -152,37 +121,6 @@ support tidy evaluation." />
 <code>markers</code> in the dataset <code>data</code> that are corrected
 (adjusted) for batch effects, i.e. differential measurement
 error between levels of <code>batch</code>.</p>
-<p>If no true differences between batches are expected, because
-samples have been randomized to batches, then a <code>method</code>
-that returns adjusted values with equal means
-(<code>method = simple</code>) or with equal rank values
-(<code>method = quantnorm</code>) for all batches is appropriate.</p>
-<p>If the distribution of determinants of biomarker values
-(<code>confounders</code>) differs between batches, then a
-<code>method</code> that retains these "true" differences
-between batches while adjusting for batch effects
-may be appropriate: <code>method = standardize</code> and
-<code>method = ipw</code> address means; <code>method = quantreg</code>
-addresses lower values and dynamic range separately.</p>
-<p>Which <code>method</code> to choose depends on the properties of
-batch effects (affecting means or also variance?) and
-the presence and strength of confounding. For the two
-mean-only confounder-adjusted methods, the choice may depend
-on  whether the confounder--batch association (<code>method = ipw</code>)
-or the confounder--biomarker association
-(<code>method = standardize</code>) can be modeled better.
-Generally, if batch effects are present, any adjustment
-method tends to perform better than no adjustment in
-reducing bias and increasing between-study reproducibility.
-See references.</p>
-<p>All adjustment approaches except <code>method = quantnorm</code>
-are based on linear models. It is recommended that variables
-for <code>markers</code> and <code>confounders</code> first be transformed
-as necessary (e.g., <code><a href='https://rdrr.io/r/base/Log.html'>log</a></code> transformations or
-<code>splines</code>). Scaling or mean centering are not necessary,
-and adjusted values are returned on the original scale.
-Parameters <code>markers</code>, <code>batch</code>, and <code>confounders</code>
-support tidy evaluation.</p>
     </div>
 
     <pre class="usage"><span class='fu'>adjust_batch</span><span class='op'>(</span>
@@ -279,6 +217,45 @@ Quantiles to scale. Defaults to <code><a href='https://rdrr.io/r/base/c.html'>c(
 variable(s) added at the end. Model diagnostics, using
 the attribute <code>.batchtma</code> of this dataset, are available
 via the <code><a href='diagnose_models.html'>diagnose_models</a></code> function.</p>
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>If no true differences between batches are expected, because
+samples have been randomized to batches, then a <code>method</code>
+that returns adjusted values with equal means
+(<code>method = simple</code>) or with equal rank values
+(<code>method = quantnorm</code>) for all batches is appropriate.</p>
+<p>If the distribution of determinants of biomarker values
+(<code>confounders</code>) differs between batches, then a
+<code>method</code> that retains these "true" differences
+between batches while adjusting for batch effects
+may be appropriate: <code>method = standardize</code> and
+<code>method = ipw</code> address means; <code>method = quantreg</code>
+addresses lower values and dynamic range separately.</p>
+<p>Which <code>method</code> to choose depends on the properties of
+batch effects (affecting means or also variance?) and
+the presence and strength of confounding. For the two
+mean-only confounder-adjusted methods, the choice may depend
+on  whether the confounder--batch association (<code>method = ipw</code>)
+or the confounder--biomarker association
+(<code>method = standardize</code>) can be modeled better.
+Generally, if batch effects are present, any adjustment
+method tends to perform better than no adjustment in
+reducing bias and increasing between-study reproducibility.
+See references.</p>
+<p>All adjustment approaches except <code>method = quantnorm</code>
+are based on linear models. It is recommended that variables
+for <code>markers</code> and <code>confounders</code> first be transformed
+as necessary (e.g., <code><a href='https://rdrr.io/r/base/Log.html'>log</a></code> transformations or
+<code>splines</code>). Scaling or mean centering are not necessary,
+and adjusted values are returned on the original scale.
+Parameters <code>markers</code>, <code>batch</code>, and <code>confounders</code>
+support tidy evaluation.</p>
+<p>Observations with missing values for the <code>markers</code> and
+<code>confounders</code> will be ignored in the estimation of adjustment
+parameters, as are empty batches. Batch effect-adjusted values
+for observations with existing marker values but missing
+confounders are based on adjustment parameters derived from the
+other observations in a batch with non-missing confounders.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
     <p>Rosner B, Cook N, Portman R, Daniels S, Falkner B.
