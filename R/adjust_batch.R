@@ -58,10 +58,11 @@ batchmean_standardize <- function(data, markers, confounders) {
                         names_to = "marker",
                         values_to = "value") %>%
     dplyr::filter(!is.na(.data$value)) %>%
-    dplyr::mutate(.batchvar = factor_drop(.batchvar)) %>%
     dplyr::group_by(.data$marker) %>%
     tidyr::nest(data = c(-.data$marker)) %>%
     dplyr::mutate(
+      data = purrr::map(.x = .data$data,
+                        .f = ~.x %>% mutate(.batchvar = factor_drop(.data$.batchvar))),
       model = purrr::map(
         .x = .data$data,
         .f = ~stats::lm(
@@ -110,7 +111,7 @@ batchmean_ipw <- function(data, markers, confounders,
     data <- data %>%
       dplyr::rename(variable = dplyr::one_of(variable)) %>%
       dplyr::filter(!is.na(.data$variable)) %>%
-      dplyr::mutate(.batchvar = factor_drop(.batchvar))
+      dplyr::mutate(.batchvar = factor_drop(.data$.batchvar))
 
     res <- data %>%
       tidyr::nest(data = dplyr::everything()) %>%
@@ -194,7 +195,7 @@ batchmean_ipw <- function(data, markers, confounders,
   purrr::map(.x = data %>% dplyr::select(!!markers) %>% names(),
              .f = ipwbatch,
              data = data %>%
-               dplyr::filter(dplyr::across(all_of(confounders), ~!is.na(.x))),
+               dplyr::filter(dplyr::across(dplyr::all_of(confounders), ~!is.na(.x))),
              truncate = truncate,
              confounders = paste(confounders, sep = " + ", collapse = " + "))
 }
@@ -206,24 +207,25 @@ batchmean_ipw <- function(data, markers, confounders,
 #' @param variable Single variable to batch-adjust
 #' @param confounders Confounders: features that differ
 #' @param tau Quantiles to use for scaling
+#' @param rq_method Algorithmic method to fit quantile regression.
 #'
 #' @return Tibble of quantiles per batch
 #' @noRd
-batchrq <- function(data, variable, confounders, tau) {
+batchrq <- function(data, variable, confounders, tau, rq_method) {
   variable <- dplyr::enquo(variable)
   res <- data %>%
     dplyr::rename(variable = !!variable) %>%
     dplyr::filter(!is.na(.data$variable)) %>%
-    dplyr::mutate(.batchvar = factor_drop(.batchvar)) %>%
+    dplyr::mutate(.batchvar = factor_drop(.data$.batchvar)) %>%
     tidyr::nest(data = dplyr::everything()) %>%
     dplyr::mutate(
       un = purrr::map(.x = .data$data,
                       .f = ~quantreg::rq(formula = variable ~ .batchvar,
-                                         data = .x, tau = tau, method = "fn")),
+                                         data = .x, tau = tau, method = rq_method)),
       ad = purrr::map(.x = .data$data,
                       .f = ~quantreg::rq(formula = stats::as.formula(
                         paste("variable ~ .batchvar", confounders)),
-                        data = .x, tau = tau, method = "fn")),
+                        data = .x, tau = tau, method = rq_method)),
       .batchvar = purrr::map(.x = .data$data,
                              .f = ~.x %>% dplyr::pull(.data$.batchvar) %>% levels()))
 
@@ -312,14 +314,14 @@ batch_quantnorm <- function(var, batch) {
 #'     weighting for assignment to a specific batch in multinomial
 #'     models, conditional on confounders, will be subtracted.
 #'     Stabilized weights are used, truncated at quantiles
-#'     defined by the \code{truncate} parameters. If no
+#'     defined by the \code{ipw_truncate} parameters. If no
 #'     \code{confounders} are supplied, \code{method = simple}
 #'     is equivalent and will be used.
 #'   * \code{quantreg}  Lower quantiles (default: 25th percentile)
 #'     and ranges between a lower and an upper quantile (default: 75th
 #'     percentile) will be unified between batches, allowing for
 #'     differences in both parameters due to confounders. Set the two
-#'     quantiles using the \code{tau} parameters.
+#'     quantiles using the \code{quantreg_tau} parameters.
 #'   * \code{quantnorm}  Quantile normalization between batches. No
 #'     adjustment for confounders.
 #' @param confounders Optional: Confounders, i.e. determinants of
@@ -337,11 +339,14 @@ batch_quantnorm <- function(var, batch) {
 #'   * \code{_adj4} from \code{method = ipw}
 #'   * \code{_adj5} from \code{method = quantreg}
 #'   * \code{_adj6} from \code{method = quantnorm}
-#' @param truncate Optional and used for \code{method = ipw} only:
+#' @param ipw_truncate Optional and used for \code{method = ipw} only:
 #'   Lower and upper extreme quantiles to truncate stabilized
 #'   weights at. Defaults to \code{c(0.025, 0.975)}.
-#' @param tau Optional and used for \code{method = quantreg} only:
+#' @param quantreg_tau Optional and used for \code{method = quantreg} only:
 #'   Quantiles to scale. Defaults to \code{c(0.25, 0.75)}.
+#' @param quantreg_method Optional and used for \code{method = quantreg} only:
+#'   Algorithmic method to fit quantile regression. Defaults to
+#'   \code{"fn"}. See parameter \code{method} of \code{\link[quantreg]{rq}}.
 #'
 #' @details
 #' If no true differences between batches are expected, because
@@ -442,8 +447,9 @@ adjust_batch <- function(data, markers, batch,
                                     "quantreg", "quantnorm"),
                          confounders = NULL,
                          suffix = "_adjX",
-                         truncate = c(0.025, 0.975),
-                         tau = c(0.25, 0.75)) {
+                         ipw_truncate = c(0.025, 0.975),
+                         quantreg_tau = c(0.25, 0.75),
+                         quantreg_method = "fn") {
   method <- as.character(dplyr::enexpr(method))
   allmethods <- c("simple", "standardize", "ipw", "quantreg", "quantnorm")
   markers     <- dplyr::enquo(markers)
@@ -488,11 +494,11 @@ adjust_batch <- function(data, markers, batch,
 
     res <- switch(
       method,
-      "simple" = batchmean_simple(data = data, markers = !!markers),
+      "simple"      = batchmean_simple(data = data, markers = !!markers),
       "standardize" = batchmean_standardize(data = data, markers = !!markers,
                                             confounders = confounders),
-      "ipw"    = batchmean_ipw(   data = data, markers = !!markers,
-                                  confounders = confounders))
+      "ipw"         = batchmean_ipw(data = data, markers = !!markers,
+                                    confounders = confounders, truncate = ipw_truncate))
     adjust_parameters <- purrr::map_dfr(.x = res, .f = ~purrr::pluck(.x, "values"))
     method_indices <- c("simple" = 2, "standardize" = 3, "ipw" = 4)
     if(suffix == "_adjX")
@@ -515,13 +521,14 @@ adjust_batch <- function(data, markers, batch,
       .x = data %>% dplyr::select(!!markers) %>% names(),
       .f = batchrq,
       data        = data %>%
-        dplyr::filter(dplyr::across(all_of(confounders), ~!is.na(.x))),
+        dplyr::filter(dplyr::across(dplyr::all_of(confounders), ~!is.na(.x))),
       confounders = dplyr::if_else(confounders != "",
                                    true  = paste0("+ ",
                                                   paste(confounders,
                                                         sep = " + ", collapse = " + ")),
                                    false = ""),
-      tau         = tau)
+      tau         = quantreg_tau,
+      rq_method   = quantreg_method)
     adjust_parameters <- purrr::map_dfr(.x = res, .f = ~purrr::pluck(.x, "values"))
     if(suffix == "_adjX")
       suffix <- "_adj5"

@@ -11,8 +11,9 @@ adjust_batch(
   method = c("simple", "standardize", "ipw", "quantreg", "quantnorm"),
   confounders = NULL,
   suffix = "_adjX",
-  truncate = c(0.025, 0.975),
-  tau = c(0.25, 0.75)
+  ipw_truncate = c(0.025, 0.975),
+  quantreg_tau = c(0.25, 0.75),
+  quantreg_method = "fn"
 )
 }
 \arguments{
@@ -36,14 +37,14 @@ is equivalent and will be used.
 weighting for assignment to a specific batch in multinomial
 models, conditional on confounders, will be subtracted.
 Stabilized weights are used, truncated at quantiles
-defined by the \code{truncate} parameters. If no
+defined by the \code{ipw_truncate} parameters. If no
 \code{confounders} are supplied, \code{method = simple}
 is equivalent and will be used.
 \item \code{quantreg}  Lower quantiles (default: 25th percentile)
 and ranges between a lower and an upper quantile (default: 75th
 percentile) will be unified between batches, allowing for
 differences in both parameters due to confounders. Set the two
-quantiles using the \code{tau} parameters.
+quantiles using the \code{quantreg_tau} parameters.
 \item \code{quantnorm}  Quantile normalization between batches. No
 adjustment for confounders.
 }}
@@ -67,12 +68,16 @@ after batch adjustment. Defaults to \code{"_adjX"}, with
 \item \code{_adj6} from \code{method = quantnorm}
 }}
 
-\item{truncate}{Optional and used for \code{method = ipw} only:
+\item{ipw_truncate}{Optional and used for \code{method = ipw} only:
 Lower and upper extreme quantiles to truncate stabilized
 weights at. Defaults to \code{c(0.025, 0.975)}.}
 
-\item{tau}{Optional and used for \code{method = quantreg} only:
+\item{quantreg_tau}{Optional and used for \code{method = quantreg} only:
 Quantiles to scale. Defaults to \code{c(0.25, 0.75)}.}
+
+\item{quantreg_method}{Optional and used for \code{method = quantreg} only:
+Algorithmic method to fit quantile regression. Defaults to
+\code{"fn"}. See parameter \code{method} of \code{\link[quantreg]{rq}}.}
 }
 \value{
 The \code{data} dataset with batch effect-adjusted
