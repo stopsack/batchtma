@@ -130,8 +130,9 @@ error between levels of <code>batch</code>.</p>
   method <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"simple"</span>, <span class='st'>"standardize"</span>, <span class='st'>"ipw"</span>, <span class='st'>"quantreg"</span>, <span class='st'>"quantnorm"</span><span class='op'>)</span>,
   confounders <span class='op'>=</span> <span class='cn'>NULL</span>,
   suffix <span class='op'>=</span> <span class='st'>"_adjX"</span>,
-  truncate <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.025</span>, <span class='fl'>0.975</span><span class='op'>)</span>,
-  tau <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.25</span>, <span class='fl'>0.75</span><span class='op'>)</span>
+  ipw_truncate <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.025</span>, <span class='fl'>0.975</span><span class='op'>)</span>,
+  quantreg_tau <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.25</span>, <span class='fl'>0.75</span><span class='op'>)</span>,
+  quantreg_method <span class='op'>=</span> <span class='st'>"fn"</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -164,14 +165,14 @@ is equivalent and will be used.</p></li>
 weighting for assignment to a specific batch in multinomial
 models, conditional on confounders, will be subtracted.
 Stabilized weights are used, truncated at quantiles
-defined by the <code>truncate</code> parameters. If no
+defined by the <code>ipw_truncate</code> parameters. If no
 <code>confounders</code> are supplied, <code>method = simple</code>
 is equivalent and will be used.</p></li>
 <li><p><code>quantreg</code>  Lower quantiles (default: 25th percentile)
 and ranges between a lower and an upper quantile (default: 75th
 percentile) will be unified between batches, allowing for
 differences in both parameters due to confounders. Set the two
-quantiles using the <code>tau</code> parameters.</p></li>
+quantiles using the <code>quantreg_tau</code> parameters.</p></li>
 <li><p><code>quantnorm</code>  Quantile normalization between batches. No
 adjustment for confounders.</p></li>
 </ul></td>
@@ -199,15 +200,21 @@ after batch adjustment. Defaults to <code>"_adjX"</code>, with
 </ul></td>
     </tr>
     <tr>
-      <th>truncate</th>
+      <th>ipw_truncate</th>
       <td><p>Optional and used for <code>method = ipw</code> only:
 Lower and upper extreme quantiles to truncate stabilized
 weights at. Defaults to <code><a href='https://rdrr.io/r/base/c.html'>c(0.025, 0.975)</a></code>.</p></td>
     </tr>
     <tr>
-      <th>tau</th>
+      <th>quantreg_tau</th>
       <td><p>Optional and used for <code>method = quantreg</code> only:
 Quantiles to scale. Defaults to <code><a href='https://rdrr.io/r/base/c.html'>c(0.25, 0.75)</a></code>.</p></td>
+    </tr>
+    <tr>
+      <th>quantreg_method</th>
+      <td><p>Optional and used for <code>method = quantreg</code> only:
+Algorithmic method to fit quantile regression. Defaults to
+<code>"fn"</code>. See parameter <code>method</code> of <code><a href='https://rdrr.io/pkg/quantreg/man/rq.html'>rq</a></code>.</p></td>
     </tr>
     </table>
 
