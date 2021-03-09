@@ -1,3 +1,8 @@
+# batchtma 0.1.3
+
+* Compose formula in `batchrq()` using `stats::reformulate()`.
+
+
 # batchtma 0.1.2
 
 * Consistently allow for missing biomarker and confounder values as well as empty batches.

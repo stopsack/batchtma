@@ -62,7 +62,8 @@ batchmean_standardize <- function(data, markers, confounders) {
     tidyr::nest(data = c(-.data$marker)) %>%
     dplyr::mutate(
       data = purrr::map(.x = .data$data,
-                        .f = ~.x %>% mutate(.batchvar = factor_drop(.data$.batchvar))),
+                        .f = ~.x %>%
+                          dplyr::mutate(.batchvar = factor_drop(.data$.batchvar))),
       model = purrr::map(
         .x = .data$data,
         .f = ~stats::lm(
@@ -223,8 +224,9 @@ batchrq <- function(data, variable, confounders, tau, rq_method) {
                       .f = ~quantreg::rq(formula = variable ~ .batchvar,
                                          data = .x, tau = tau, method = rq_method)),
       ad = purrr::map(.x = .data$data,
-                      .f = ~quantreg::rq(formula = stats::as.formula(
-                        paste("variable ~ .batchvar", confounders)),
+                      .f = ~quantreg::rq(formula = stats::reformulate(
+                        response = "variable",
+                        termlabels = c(".batchvar", confounders)),
                         data = .x, tau = tau, method = rq_method)),
       .batchvar = purrr::map(.x = .data$data,
                              .f = ~.x %>% dplyr::pull(.data$.batchvar) %>% levels()))
