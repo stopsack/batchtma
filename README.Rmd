@@ -44,19 +44,24 @@ install.packages("batchtma")
 ## Usage
 
 Load the package:
-```{r}
+```{r eval=TRUE}
 library(batchtma)
 ```
 
 Define example data with batch effects:
-```{r}
+```{r eval=TRUE}
 df <- data.frame(tma = rep(1:2, times = 10),
                  biomarker = rep(1:2, times = 10) + runif(max = 5, n = 20))
 ```
 
 Run the `adjust_batch()` function to adjust for batch effects:
-```{r}
-adjust_batch(data = df, markers = biomarker, batch = tma, method = simple)
+```{r example, eval=TRUE, fig.show="hold", out.width='40%'}
+df_adjust <- adjust_batch(data = df, markers = biomarker, batch = tma, method = simple)
+
+plot_batch(data = df, marker = biomarker, batch = tma) +
+  ggplot2::ggtitle("Raw data")
+plot_batch(data = df_adjust, marker = biomarker_adj2, batch = tma) + 
+  ggplot2::ggtitle("Adjusted data")
 ```
 
 * The ["Get Started"](articles/batchtma.html) vignette has details on how to use the package. 
