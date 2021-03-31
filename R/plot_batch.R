@@ -64,8 +64,8 @@
 #'            batch = tma, color = confounder) +
 #'   ggplot2::labs(y = "Biomarker (variable 'noisy')")
 plot_batch <- function(data, marker, batch, color = NULL, maxlevels = 15, ...) {
-  marker <- dplyr::enquo(marker)
-  batch <- dplyr::enquo(batch)
+  marker <- dplyr::ensym(marker)
+  batch <- dplyr::ensym(batch)
   color <- dplyr::enquo(color)
   nlevels <- 101
   data2 <- data %>% dplyr::select(colvar = !!color)
