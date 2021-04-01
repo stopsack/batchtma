@@ -50,10 +50,8 @@ Run the `adjust_batch()` function to adjust for batch effects:
 ``` r
 df_adjust <- adjust_batch(data = df, markers = biomarker, batch = tma, method = simple)
 
-plot_batch(data = df, marker = biomarker, batch = tma) +
-  ggplot2::ggtitle("Raw data")
-plot_batch(data = df_adjust, marker = biomarker_adj2, batch = tma) + 
-  ggplot2::ggtitle("Adjusted data")
+plot_batch(data = df, marker = biomarker, batch = tma, title = "Raw data")
+plot_batch(data = df_adjust, marker = biomarker_adj2, batch = tma, title = "Adjusted data")
 ```
 
 <img src="man/figures/README-example-1.png" width="40%" /><img src="man/figures/README-example-2.png" width="40%" />

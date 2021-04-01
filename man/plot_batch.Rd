@@ -4,7 +4,15 @@
 \alias{plot_batch}
 \title{Plot biomarkers by batch}
 \usage{
-plot_batch(data, marker, batch, color = NULL, maxlevels = 15, ...)
+plot_batch(
+  data,
+  marker,
+  batch,
+  color = NULL,
+  maxlevels = 15,
+  title = NULL,
+  ...
+)
 }
 \arguments{
 \item{data}{Dataset.}
@@ -21,6 +29,9 @@ to show differences in a confounder.}
 levels for \code{color} parameter to accept as a discrete
 variable, rather than a continuous variable.
 Defaults to \code{15}.}
+
+\item{title}{Optional: character string that specifies plot
+title}
 
 \item{...}{Optional: Passed on to \code{\link[ggplot2]{ggplot}}.}
 }

@@ -20,6 +20,8 @@
 #'   levels for \code{color} parameter to accept as a discrete
 #'   variable, rather than a continuous variable.
 #'   Defaults to \code{15}.
+#' @param title Optional: character string that specifies plot
+#' title
 #' @param ... Optional: Passed on to \code{\link[ggplot2]{ggplot}}.
 #'
 #' @return ggplot2 object, which can be further
@@ -63,12 +65,12 @@
 #' plot_batch(data = df, marker = biomarker,
 #'            batch = tma, color = confounder) +
 #'   ggplot2::labs(y = "Biomarker (variable 'noisy')")
-plot_batch <- function(data, marker, batch, color = NULL, maxlevels = 15, ...) {
+plot_batch <- function(data, marker, batch, color = NULL, maxlevels = 15, title = NULL, ...) {
 
   # Set levels to number of discrete entries for `color` or 101 if NULL.
   # If count of `color` has only 1 row, that indicates NULL was passed.
   nlevels <- nrow(dplyr::count(data, {{ color }}))
-  nlevels <- if_else(nlevels > 1, nlevels, 101L)
+  nlevels <- dplyr::if_else(nlevels > 1, nlevels, 101L)
 
   if(nlevels < maxlevels)
     data <- dplyr::mutate(data, {{ color }} := factor({{ color }}))
@@ -81,7 +83,9 @@ plot_batch <- function(data, marker, batch, color = NULL, maxlevels = 15, ...) {
     ggplot2::geom_boxplot(outlier.shape = NA, color = "black") +
     ggplot2::theme_minimal() +
     ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
-                   axis.text = ggplot2::element_text(size = 10, color = "black")) +
+                   axis.text.x = ggplot2::element_text(size = 10, color = "black"),
+                   axis.title.y = ggplot2::element_blank()) +
+    ggplot2::ggtitle(title)
     ggplot2::stat_summary(geom = "point", fun = "mean", col = "black",
                           size = 5, shape = 8, stroke = 1, fill = "black")
 
@@ -91,14 +95,14 @@ plot_batch <- function(data, marker, batch, color = NULL, maxlevels = 15, ...) {
         width = 0.2, height = 0,
         mapping = ggplot2::aes(color = {{ color }}, shape = {{ color }})
       ) +
-      ggplot2::scale_shape_manual(name = enquo(color), values = 15:30) +
-      ggplot2::scale_color_viridis_d(name = enquo(color), option = "cividis")
+      ggplot2::scale_shape_manual(name = dplyr::enquo(color), values = 15:30) +
+      ggplot2::scale_color_viridis_d(name = dplyr::enquo(color), option = "cividis")
   }
   else {
     myplot +
       ggplot2::geom_jitter(
         width = 0.2, height = 0,
         mapping = ggplot2::aes(color = {{ color }})) +
-      ggplot2::scale_color_viridis_c(name = enquo(color), option = "cividis")
+      ggplot2::scale_color_viridis_c(name = dplyr::enquo(color), option = "cividis")
   }
 }
