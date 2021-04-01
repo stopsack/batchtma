@@ -28,9 +28,8 @@ factor_drop <- function(f) {
 #' @return Tibble of means per marker and batch
 #' @noRd
 batchmean_simple <- function(data, markers) {
-  markers <- dplyr::enquo(markers)
   values <- data %>%
-    dplyr::select(.data$.id, .data$.batchvar, !!markers) %>%
+    dplyr::select(.data$.id, .data$.batchvar, {{ markers }}) %>%
     dplyr::group_by(.data$.batchvar) %>%
     dplyr::summarize_at(.vars = dplyr::vars(-.data$.id),
                         .funs = mean, na.rm = TRUE) %>%
@@ -52,9 +51,8 @@ batchmean_simple <- function(data, markers) {
 #' @return Tibble with conditional means per marker and batch
 #' @noRd
 batchmean_standardize <- function(data, markers, confounders) {
-  markers <- dplyr::enquo(markers)
   res <- data %>%
-    tidyr::pivot_longer(cols = !!markers,
+    tidyr::pivot_longer(cols = {{ markers }},
                         names_to = "marker",
                         values_to = "value") %>%
     dplyr::filter(!is.na(.data$value)) %>%
@@ -107,7 +105,6 @@ batchmean_standardize <- function(data, markers, confounders) {
 #' @noRd
 batchmean_ipw <- function(data, markers, confounders,
                           truncate = c(0.025, 0.975)) {
-  markers <- dplyr::enquo(markers)
   ipwbatch <- function(data, variable, confounders, truncate) {
     data <- data %>%
       dplyr::rename(variable = dplyr::one_of(variable)) %>%
@@ -193,7 +190,7 @@ batchmean_ipw <- function(data, markers, confounders,
     list(values = values, models = res %>% dplyr::pull(.data$den))
   }
 
-  purrr::map(.x = data %>% dplyr::select(!!markers) %>% names(),
+  purrr::map(.x = data %>% dplyr::select({{ markers }}) %>% names(),
              .f = ipwbatch,
              data = data %>%
                dplyr::filter(dplyr::across(dplyr::all_of(confounders), ~!is.na(.x))),
@@ -213,9 +210,8 @@ batchmean_ipw <- function(data, markers, confounders,
 #' @return Tibble of quantiles per batch
 #' @noRd
 batchrq <- function(data, variable, confounders, tau, rq_method) {
-  variable <- dplyr::enquo(variable)
   res <- data %>%
-    dplyr::rename(variable = !!variable) %>%
+    dplyr::rename(variable = {{ variable }}) %>%
     dplyr::filter(!is.na(.data$variable)) %>%
     dplyr::mutate(.batchvar = factor_drop(.data$.batchvar)) %>%
     tidyr::nest(data = dplyr::everything()) %>%
@@ -261,7 +257,7 @@ batchrq <- function(data, variable, confounders, tau, rq_method) {
                      all_iq = stats::median(.data$all_iq)) %>%
     dplyr::mutate(un_iq  = .data$un_hi - .data$un_lo,
                   ad_iq  = .data$ad_hi - .data$ad_lo,
-                  marker = !!variable)
+                  marker = {{ variable }})
 
   models <- res %>% dplyr::pull(.data$ad)
   return(tibble::lst(values, models))
@@ -454,17 +450,14 @@ adjust_batch <- function(data, markers, batch,
                          quantreg_method = "fn") {
   method <- as.character(dplyr::enexpr(method))
   allmethods <- c("simple", "standardize", "ipw", "quantreg", "quantnorm")
-  markers     <- dplyr::enquo(markers)
-  batch       <- dplyr::enquo(batch)
-  confounders <- dplyr::enquo(confounders)
   data_orig <- data %>%
     dplyr::mutate(.id = dplyr::row_number())
   data <- data_orig %>%
-    dplyr::rename(.batchvar = !!batch) %>%
+    dplyr::rename(.batchvar = {{ batch }}) %>%
     dplyr::mutate(.batchvar = factor(.data$.batchvar),
                   .batchvar = factor_drop(.data$.batchvar)) %>%
-    dplyr::select(.data$.id, .data$.batchvar, !!markers, !!confounders)
-  confounders <- data %>% dplyr::select(!!confounders) %>% names()
+    dplyr::select(.data$.id, .data$.batchvar, {{ markers }}, {{ confounders }})
+  confounders <- data %>% dplyr::select({{ confounders }}) %>% names()
 
   # Check inputs: method and confounders
   if(!(method[1] %in% allmethods))
@@ -474,20 +467,20 @@ adjust_batch <- function(data, markers, batch,
                 "See: help(\"adjust_batch\")."))
 
   if(method %in% c("simple", "quantnorm") &
-     data %>% dplyr::select(!!confounders) %>% ncol() > 0) {
+     data %>% dplyr::select({{ confounders }}) %>% ncol() > 0) {
     message(paste0("Batch effect correction via 'method = ", method,
                    "' was requested.\n This method does not support ",
                    "adjustment for confounders (",
-                   paste(confounders, sep = ", ", collapse = ", "),
+                   paste(dplyr::enexpr(confounders), sep = ", ", collapse = ", "),
                    "). They will be ignored."))
-    data <- data %>% dplyr::select(-dplyr::any_of(confounders))
+    data <- data %>% dplyr::select(-dplyr::any_of({{ confounders }}))
     confounders <- NULL
   }
 
   # Mean-based methods
   if(method %in% c("simple", "standardize", "ipw")) {
     if(method %in% c("standardize", "ipw") &
-       data %>% dplyr::select(!!confounders) %>% ncol() == 0) {
+       data %>% dplyr::select({{ confounders }}) %>% ncol() == 0) {
       message(paste0("Batch effect correction via 'method = ", method,
                      "' was requested,\nbut no valid confounders were provided. ",
                      "'method = simple' is used instead."))
@@ -496,18 +489,18 @@ adjust_batch <- function(data, markers, batch,
 
     res <- switch(
       method,
-      "simple"      = batchmean_simple(data = data, markers = !!markers),
-      "standardize" = batchmean_standardize(data = data, markers = !!markers,
-                                            confounders = confounders),
-      "ipw"         = batchmean_ipw(data = data, markers = !!markers,
-                                    confounders = confounders, truncate = ipw_truncate))
+      "simple"      = batchmean_simple(data = data, markers = {{ markers }}),
+      "standardize" = batchmean_standardize(data = data, markers = {{ markers }},
+                                            confounders = {{ confounders }}),
+      "ipw"         = batchmean_ipw(data = data, markers = {{ markers }},
+                                    confounders = {{ confounders }}, truncate = ipw_truncate))
     adjust_parameters <- purrr::map_dfr(.x = res, .f = ~purrr::pluck(.x, "values"))
     method_indices <- c("simple" = 2, "standardize" = 3, "ipw" = 4)
     if(suffix == "_adjX")
       suffix <- paste0("_adj", method_indices[method[1]])
 
     values <- data %>%
-      dplyr::select(-dplyr::any_of(confounders)) %>%
+      dplyr::select(-dplyr::any_of({{ confounders }})) %>%
       tidyr::pivot_longer(cols = c(-.data$.id, -.data$.batchvar),
                           names_to = "marker",
                           values_to = "value") %>%
@@ -520,13 +513,13 @@ adjust_batch <- function(data, markers, batch,
   # Quantile regression
   if(method == "quantreg") {
     res <- purrr::map(
-      .x = data %>% dplyr::select(!!markers) %>% names(),
+      .x = data %>% dplyr::select({{ markers }}) %>% names(),
       .f = batchrq,
-      data        = data %>%
-        dplyr::filter(dplyr::across(dplyr::all_of(confounders), ~!is.na(.x))),
-      confounders = dplyr::if_else(confounders != "",
+      data = data %>%
+        dplyr::filter(dplyr::across(dplyr::all_of({{ confounders }}), ~!is.na(.x))),
+      confounders = dplyr::if_else(dplyr::enexpr(confounders) != "",
                                    true  = paste0("+ ",
-                                                  paste(confounders,
+                                                  paste(dplyr::enexpr(confounders),
                                                         sep = " + ", collapse = " + ")),
                                    false = ""),
       tau         = quantreg_tau,
@@ -537,7 +530,7 @@ adjust_batch <- function(data, markers, batch,
 
     values <- data %>%
       tidyr::pivot_longer(cols = c(-.data$.id, -.data$.batchvar,
-                                   -dplyr::any_of(confounders)),
+                                   -dplyr::any_of({{ confounders }})),
                           names_to = "marker",
                           values_to = "value") %>%
       dplyr::left_join(adjust_parameters, by = c("marker", ".batchvar")) %>%
@@ -546,7 +539,7 @@ adjust_batch <- function(data, markers, batch,
                       .data$un_iq * .data$all_iq * (.data$un_iq / .data$ad_iq) +
                       .data$all_lo - .data$ad_lo + .data$un_lo,
                     marker = paste0(.data$marker, suffix)) %>%
-      dplyr::select(-dplyr::any_of(confounders),
+      dplyr::select(-dplyr::any_of({{ confounders }}),
                     -.data$value, -.data$un_lo, -.data$un_hi,
                     -.data$ad_lo, -.data$ad_hi, -.data$un_iq, -.data$ad_iq,
                     -.data$all_iq, -.data$all_lo)
@@ -557,7 +550,7 @@ adjust_batch <- function(data, markers, batch,
     if(suffix == "_adjX")
       suffix <- "_adj6"
     values <- data %>%
-      dplyr::select(-dplyr::any_of(confounders)) %>%
+      dplyr::select(-dplyr::any_of({{ confounders }})) %>%
       tidyr::pivot_longer(cols = c(-.data$.id, -.data$.batchvar),
                           names_to = "marker",
                           values_to = "value") %>%
@@ -569,7 +562,7 @@ adjust_batch <- function(data, markers, batch,
       dplyr::select(-.data$value)
     res <- list(list(res = NULL, models = NULL))
     adjust_parameters <- tibble::tibble(marker = data %>%
-                                          dplyr::select(!!markers) %>% names())
+                                          dplyr::select({{ markers }}) %>% names())
   }
 
   # Dataset to return
@@ -583,10 +576,10 @@ adjust_batch <- function(data, markers, batch,
   # Meta-data to return as attribute
   attr_list <- list(
     adjust_method     = method,
-    markers           = data_orig %>% dplyr::select(!!markers) %>% names(),
+    markers           = data_orig %>% dplyr::select({{ markers }}) %>% names(),
     suffix            = suffix,
-    batchvar          = data_orig %>% dplyr::select(!!batch) %>% names(),
-    confounders       = confounders,
+    batchvar          = data_orig %>% dplyr::select({{ batch }}) %>% names(),
+    confounders       = dplyr::enexpr(confounders),
     adjust_parameters = adjust_parameters,
     model_fits        = purrr::map(.x = res, .f = ~purrr::pluck(.x, "models")))
   class(attr_list) <- c("batchtma", class(res))

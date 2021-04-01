@@ -68,8 +68,8 @@
 plot_batch <- function(data, marker, batch, color = NULL, maxlevels = 15, title = NULL, ...) {
 
   # Set levels to number of discrete entries for `color` or 101 if NULL.
-  # If count of `color` has only 1 row, that indicates NULL was passed.
-  nlevels <- nrow(dplyr::count(data, {{ color }}))
+  # If discinct count of `color` is only 1, that indicates NULL was passed.
+  nlevels <- dplyr::n_distinct(dplyr::select(data, {{color}}))
   nlevels <- dplyr::if_else(nlevels > 1, nlevels, 101L)
 
   if(nlevels < maxlevels)
@@ -85,7 +85,7 @@ plot_batch <- function(data, marker, batch, color = NULL, maxlevels = 15, title 
     ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
                    axis.text.x = ggplot2::element_text(size = 10, color = "black"),
                    axis.title.y = ggplot2::element_blank()) +
-    ggplot2::ggtitle(title)
+    ggplot2::ggtitle(title) +
     ggplot2::stat_summary(geom = "point", fun = "mean", col = "black",
                           size = 5, shape = 8, stroke = 1, fill = "black")
 
@@ -95,14 +95,14 @@ plot_batch <- function(data, marker, batch, color = NULL, maxlevels = 15, title 
         width = 0.2, height = 0,
         mapping = ggplot2::aes(color = {{ color }}, shape = {{ color }})
       ) +
-      ggplot2::scale_shape_manual(name = dplyr::enquo(color), values = 15:30) +
-      ggplot2::scale_color_viridis_d(name = dplyr::enquo(color), option = "cividis")
+      ggplot2::scale_shape_manual(name = dplyr::enexpr(color), values = 15:30) +
+      ggplot2::scale_color_viridis_d(name = dplyr::enexpr(color), option = "cividis")
   }
   else {
     myplot +
       ggplot2::geom_jitter(
         width = 0.2, height = 0,
         mapping = ggplot2::aes(color = {{ color }})) +
-      ggplot2::scale_color_viridis_c(name = dplyr::enquo(color), option = "cividis")
+      ggplot2::scale_color_viridis_c(name = dplyr::enexpr(color), option = "cividis")
   }
 }
