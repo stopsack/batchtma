@@ -68,9 +68,9 @@
 plot_batch <- function(data, marker, batch, color = NULL, maxlevels = 15, title = NULL, ...) {
 
   # Set levels to number of discrete entries for `color` or 101 if NULL.
-  # If discinct count of `color` is only 1, that indicates NULL was passed.
+  # If distinct count of `color` is only 1, that indicates NULL was passed.
   nlevels <- dplyr::n_distinct(dplyr::select(data, {{color}}))
-  nlevels <- dplyr::if_else(nlevels > 1, nlevels, 101L)
+  nlevels <- dplyr::if_else(nlevels > 1, true = nlevels, false = 101L)
 
   if(nlevels < maxlevels)
     data <- dplyr::mutate(data, {{ color }} := factor({{ color }}))
@@ -83,8 +83,7 @@ plot_batch <- function(data, marker, batch, color = NULL, maxlevels = 15, title 
     ggplot2::geom_boxplot(outlier.shape = NA, color = "black") +
     ggplot2::theme_minimal() +
     ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
-                   axis.text.x = ggplot2::element_text(size = 10, color = "black"),
-                   axis.title.y = ggplot2::element_blank()) +
+                   axis.text.x = ggplot2::element_text(size = 10, color = "black")) +
     ggplot2::ggtitle(title) +
     ggplot2::stat_summary(geom = "point", fun = "mean", col = "black",
                           size = 5, shape = 8, stroke = 1, fill = "black")
