@@ -4,7 +4,6 @@
 # batchtma R package: Methods to address batch effects
 
 <!-- badges: start -->
-
 <!-- badges: end -->
 
 The goal of the batchtma package is to provide functions for batch
@@ -49,10 +48,15 @@ df <- data.frame(tma = rep(1:2, times = 10),
 Run the `adjust_batch()` function to adjust for batch effects:
 
 ``` r
-adjust_batch(data = df, markers = biomarker, batch = tma, method = simple)
+df_adjust <- adjust_batch(data = df, markers = biomarker, batch = tma, method = simple)
+
+plot_batch(data = df, marker = biomarker, batch = tma, title = "Raw data")
+plot_batch(data = df_adjust, marker = biomarker_adj2, batch = tma, title = "Adjusted data")
 ```
 
-  - The [“Get Started”](articles/batchtma.html) vignette has details on
+<img src="man/figures/README-example-1.png" width="40%" /><img src="man/figures/README-example-2.png" width="40%" />
+
+-   The [“Get Started”](articles/batchtma.html) vignette has details on
     how to use the package.
 
 ## Methodology
@@ -66,32 +70,32 @@ characteristics that are expected to lead to differences in biomarker
 levels. They should ideally be retained when performing batch effect
 adjustments.
 
-| \# | `method =`    | Approach                      | Addressed              | Retains “true” between-batch differences |
-| -- | ------------- | ----------------------------- | ---------------------- | ---------------------------------------- |
-| 1  | —             | Unadjusted                    | —                      | Yes                                      |
-| 2  | `simple`      | Simple means                  | Means                  | No                                       |
-| 3  | `standardize` | Standardized batch means      | Means                  | Yes                                      |
-| 4  | `ipw`         | Inverse-probability weighting | Means                  | Yes                                      |
-| 5  | `quantreg`    | Quantile regression           | Low and high quantiles | Yes                                      |
-| 6  | `quantnorm`   | Quantile normalization        | All ranks              | No                                       |
+| \#  | `method =`    | Approach                      | Addressed              | Retains “true” between-batch differences |
+|-----|---------------|-------------------------------|------------------------|------------------------------------------|
+| 1   | —             | Unadjusted                    | —                      | Yes                                      |
+| 2   | `simple`      | Simple means                  | Means                  | No                                       |
+| 3   | `standardize` | Standardized batch means      | Means                  | Yes                                      |
+| 4   | `ipw`         | Inverse-probability weighting | Means                  | Yes                                      |
+| 5   | `quantreg`    | Quantile regression           | Low and high quantiles | Yes                                      |
+| 6   | `quantnorm`   | Quantile normalization        | All ranks              | No                                       |
 
-  - [“Get Started”](articles/batchtma.html) shows general examples on
+-   [“Get Started”](articles/batchtma.html) shows general examples on
     the different methods in absence and presence of confounding.
 
 ## References
 
-  - Batch means after model-based standardization for confounders
+-   Batch means after model-based standardization for confounders
     (`method = "standardize"`) are partially based on a method briefly
     described in: *Rosner B, Cook N, Portman R, Daniels S, Falkner B.
     Determination of blood pressure percentiles in normal-weight
-    children: some methodological issues. [Am J
-    Epidemiol 2008;167(6):653-66](https://pubmed.ncbi.nlm.nih.gov/18230679).*
-  - Quantile normalization (`method = "quantnorm"`) is described in:
+    children: some methodological issues. [Am J Epidemiol
+    2008;167(6):653-66](https://pubmed.ncbi.nlm.nih.gov/18230679).*
+-   Quantile normalization (`method = "quantnorm"`) is described in:
     *Bolstad BM, Irizarry RA, Åstrand M, Speed TP. A comparison of
     normalization methods for high density oligonucleotide array data
-    based on variance and bias.
-    [Bioinformatics 2003;19:185–193](https://pubmed.ncbi.nlm.nih.gov/12538238).*
-  - Further details, all methods, and suggestions for implementation and
+    based on variance and bias. [Bioinformatics
+    2003;19:185–193](https://pubmed.ncbi.nlm.nih.gov/12538238).*
+-   Further details, all methods, and suggestions for implementation and
     interpretation are in: *Stopsack KH et al., Batch effects in tumor
     biomarker studies using tissue microarrays: Extent, impact, and
     remediation. In preparation.*
