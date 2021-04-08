@@ -40,16 +40,22 @@ run of \code{\link[batchtma]{adjust_batch}} on a dataset.
 \examples{
 # Data frame with two batches
 # Batch 2 has higher values of biomarker and confounder
-df <- data.frame(tma = rep(1:2, times = 10),
-                 biomarker = rep(1:2, times = 10) +
-                   runif(max = 5, n = 20),
-                 confounder = rep(0:1, times = 10) +
-                   runif(max = 10, n = 20))
+df <- data.frame(
+  tma = rep(1:2, times = 10),
+  biomarker = rep(1:2, times = 10) +
+    runif(max = 5, n = 20),
+  confounder = rep(0:1, times = 10) +
+    runif(max = 10, n = 20)
+)
 
 # Adjust for batch effects
-df2 <- adjust_batch(data = df, markers = biomarker,
-                    batch = tma, method = quantreg,
-                    confounders = confounder)
+df2 <- adjust_batch(
+  data = df,
+  markers = biomarker,
+  batch = tma,
+  method = quantreg,
+  confounders = confounder
+)
 
 # Show overview of model diagnostics:
 diagnose_models(data = df2)

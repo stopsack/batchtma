@@ -1,3 +1,10 @@
+# batchtma 0.1.4
+
+* Bioconductor limma dependency added for `remotes::install_github()``
+* Code review, updates to curly-curly, and tidyverse style changes,
+  thanks to @tgerke
+
+
 # batchtma 0.1.3
 
 * Compose formula in `batchrq()` using `stats::reformulate()`.

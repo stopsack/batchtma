@@ -51,19 +51,29 @@ interquartile range; and asterisks indicate means.
 }
 \examples{
 # Define example data
-df <- data.frame(tma = rep(1:2, times = 10),
-                 biomarker = rep(1:2, times = 10) +
-                   runif(max = 5, n = 20),
-                 confounder = rep(0:1, times = 10) +
-                   runif(max = 10, n = 20))
+df <- data.frame(
+  tma = rep(1:2, times = 10),
+  biomarker = rep(1:2, times = 10) +
+    runif(max = 5, n = 20),
+  confounder = rep(0:1, times = 10) +
+    runif(max = 10, n = 20)
+)
 
 # Visualize batch effects:
-plot_batch(data = df, marker = biomarker,
-           batch = tma, color = confounder)
+plot_batch(
+  data = df,
+  marker = biomarker,
+  batch = tma,
+  color = confounder
+)
 
 # Label y-axis, changing graph like other ggplots:
-plot_batch(data = df, marker = biomarker,
-           batch = tma, color = confounder) +
+plot_batch(
+  data = df,
+  marker = biomarker,
+  batch = tma,
+  color = confounder
+) +
   ggplot2::labs(y = "Biomarker (variable 'noisy')")
 }
 \references{

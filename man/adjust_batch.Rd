@@ -137,24 +137,34 @@ other observations in a batch with non-missing confounders.
 \examples{
 # Data frame with two batches
 # Batch 2 has higher values of biomarker and confounder
-df <- data.frame(tma = rep(1:2, times = 10),
-                 biomarker = rep(1:2, times = 10) +
-                   runif(max = 5, n = 20),
-                 confounder = rep(0:1, times = 10) +
-                   runif(max = 10, n = 20))
+df <- data.frame(
+  tma = rep(1:2, times = 10),
+  biomarker = rep(1:2, times = 10) +
+    runif(max = 5, n = 20),
+  confounder = rep(0:1, times = 10) +
+    runif(max = 10, n = 20)
+)
 
 # Adjust for batch effects
 # Using simple means, ignoring the confounder:
-adjust_batch(data = df, markers = biomarker,
-             batch = tma, method = simple)
+adjust_batch(
+  data = df,
+  markers = biomarker,
+  batch = tma,
+  method = simple
+)
 # Returns data set with new variable "biomarker_adj2"
 
 # Use quantile regression, include the confounder,
 # change suffix of returned variable:
-adjust_batch(data = df, markers = biomarker,
-             batch = tma, method = quantreg,
-             confounders = confounder,
-             suffix = "_batchadjusted")
+adjust_batch(
+  data = df,
+  markers = biomarker,
+  batch = tma,
+  method = quantreg,
+  confounders = confounder,
+  suffix = "_batchadjusted"
+)
 # Returns data set with new variable "biomarker_batchadjusted"
 }
 \references{
