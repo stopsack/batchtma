@@ -51,47 +51,69 @@
 #'
 #' @examples
 #' # Define example data
-#' df <- data.frame(tma = rep(1:2, times = 10),
-#'                  biomarker = rep(1:2, times = 10) +
-#'                    runif(max = 5, n = 20),
-#'                  confounder = rep(0:1, times = 10) +
-#'                    runif(max = 10, n = 20))
+#' df <- data.frame(
+#'   tma = rep(1:2, times = 10),
+#'   biomarker = rep(1:2, times = 10) +
+#'     runif(max = 5, n = 20),
+#'   confounder = rep(0:1, times = 10) +
+#'     runif(max = 10, n = 20)
+#' )
 #'
 #' # Visualize batch effects:
-#' plot_batch(data = df, marker = biomarker,
-#'            batch = tma, color = confounder)
+#' plot_batch(
+#'   data = df,
+#'   marker = biomarker,
+#'   batch = tma,
+#'   color = confounder
+#' )
 #'
 #' # Label y-axis, changing graph like other ggplots:
-#' plot_batch(data = df, marker = biomarker,
-#'            batch = tma, color = confounder) +
+#' plot_batch(
+#'   data = df,
+#'   marker = biomarker,
+#'   batch = tma,
+#'   color = confounder
+#' ) +
 #'   ggplot2::labs(y = "Biomarker (variable 'noisy')")
 plot_batch <- function(data, marker, batch, color = NULL, maxlevels = 15, title = NULL, ...) {
 
   # Set levels to number of discrete entries for `color` or 101 if NULL.
   # If distinct count of `color` is only 1, that indicates NULL was passed.
-  nlevels <- dplyr::n_distinct(dplyr::select(data, {{color}}))
+  nlevels <- dplyr::n_distinct(dplyr::select(data, {{ color }}))
   nlevels <- dplyr::if_else(nlevels > 1, true = nlevels, false = 101L)
 
-  if(nlevels < maxlevels)
+  if (nlevels < maxlevels) {
     data <- dplyr::mutate(data, {{ color }} := factor({{ color }}))
+  }
 
   myplot <-
     ggplot2::ggplot(
       data = dplyr::mutate(data, {{ batch }} := factor({{ batch }})),
       mapping = ggplot2::aes(x = {{ batch }}, y = {{ marker }}),
-      ...) +
+      ...
+    ) +
     ggplot2::geom_boxplot(outlier.shape = NA, color = "black") +
     ggplot2::theme_minimal() +
-    ggplot2::theme(panel.grid.major.x = ggplot2::element_blank(),
-                   axis.text.x = ggplot2::element_text(size = 10, color = "black")) +
+    ggplot2::theme(
+      panel.grid.major.x = ggplot2::element_blank(),
+      axis.text.x = ggplot2::element_text(size = 10, color = "black")
+    ) +
     ggplot2::ggtitle(title) +
-    ggplot2::stat_summary(geom = "point", fun = "mean", col = "black",
-                          size = 5, shape = 8, stroke = 1, fill = "black")
+    ggplot2::stat_summary(
+      geom = "point",
+      fun = "mean",
+      col = "black",
+      size = 5,
+      shape = 8,
+      stroke = 1,
+      fill = "black"
+    )
 
-  if(nlevels < maxlevels) {
+  if (nlevels < maxlevels) {
     myplot +
       ggplot2::geom_jitter(
-        width = 0.2, height = 0,
+        width = 0.2,
+        height = 0,
         mapping = ggplot2::aes(color = {{ color }}, shape = {{ color }})
       ) +
       ggplot2::scale_shape_manual(name = dplyr::enexpr(color), values = 15:30) +
@@ -100,8 +122,10 @@ plot_batch <- function(data, marker, batch, color = NULL, maxlevels = 15, title 
   else {
     myplot +
       ggplot2::geom_jitter(
-        width = 0.2, height = 0,
-        mapping = ggplot2::aes(color = {{ color }})) +
+        width = 0.2,
+        height = 0,
+        mapping = ggplot2::aes(color = {{ color }})
+      ) +
       ggplot2::scale_color_viridis_c(name = dplyr::enexpr(color), option = "cividis")
   }
 }

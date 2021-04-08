@@ -22,4 +22,4 @@
 #' biomarker studies using tissue microarrays: Extent,
 #' impact, and remediation. In preparation.
 NULL
-#> NULL
+# > NULL
