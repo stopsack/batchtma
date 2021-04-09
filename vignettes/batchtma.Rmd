@@ -16,12 +16,10 @@ knitr::opts_chunk$set(
 
 # Installation
 
-Currently, the development version of batchtma can be installed from
-[GitHub](https://github.com/) using:
+Batchtma can be installed from [GitHub](https://github.com/) using:
 
 ```{r, eval = FALSE}
 # install.packages("remotes")  # The "remotes" package needs to be installed
-library(remotes)
 remotes::install_github("stopsack/batchtma")
 ```
 
@@ -280,7 +278,7 @@ The marginally standardized means per batch are the adjustment parameters estima
 diagnose_models(df2)$adjust_parameters
 ```
 
-Diagnostics for regresion models can be performed on fitted models just as for any other regression model in R. For example, residuals *vs.* fitted can be plotted:
+Diagnostics for regression models can be performed on fitted models just as for any other regression model in R. For example, residuals *vs.* fitted can be plotted:
 
 ```{r}
 tibble(fitted    = fitted.values(fit),

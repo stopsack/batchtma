@@ -25,21 +25,13 @@ The goal of the batchtma package is to provide functions for batch effect-adjust
 
 ## Installation
 
-Currently, the development version of batchtma can be installed from
-[GitHub](https://github.com/) using:
+batchtma can be installed from [GitHub](https://github.com/) using:
 
 ```{r}
 # install.packages("remotes")  # The "remotes" package needs to be installed
-library(remotes)
 remotes::install_github("stopsack/batchtma")
 ```
 
-Once released on [CRAN](https://CRAN.R-project.org), installation will
-be possible with:
-
-```{r}
-install.packages("batchtma")
-```
 
 
 ## Usage
@@ -86,4 +78,4 @@ The package implements five different approaches to obtaining batch effect-adjus
 
 * Batch means after model-based standardization for confounders (`method = "standardize"`) are partially based on a method briefly described in: *Rosner B, Cook N, Portman R, Daniels S, Falkner B. Determination of blood pressure percentiles in normal-weight children: some methodological issues. [Am J Epidemiol 2008;167(6):653-66](https://pubmed.ncbi.nlm.nih.gov/18230679).*
 * Quantile normalization (`method = "quantnorm"`) is described in: *Bolstad BM, Irizarry RA, Åstrand M, Speed TP. A comparison of normalization methods for high density oligonucleotide array data based on variance and bias. [Bioinformatics 2003;19:185–193](https://pubmed.ncbi.nlm.nih.gov/12538238).*
-* Further details, all methods, and suggestions for implementation and interpretation are in: *Stopsack KH et al., Batch effects in tumor biomarker studies using tissue microarrays: Extent, impact, and remediation. In preparation.*
+* Further details, all methods, and suggestions for implementation and interpretation are in: *Stopsack KH et al., Batch effects in tumor biomarker studies using tissue microarrays: Extent, impact, and mitigation. In preparation.*

@@ -6,7 +6,12 @@ Authors@R:
            family = "Stopsack",
            role = c("aut", "cre"),
            email = "stopsack@mskcc.org",
-           comment = c(ORCID = "0000-0002-0722-1311"))
+           comment = c(ORCID = "0000-0002-0722-1311"),
+    person(given = "Travis",
+           family = "Gerke",
+           role = c("aut"),
+           email = "travis.gerke@moffitt.org",
+           comment = c(ORCID = "0000-0002-9500-8907")))
 Description: This package provides different approaches to adjusting for
   batch effects while addressing confounding between batches,
   such as in data from tissue microarrays.
