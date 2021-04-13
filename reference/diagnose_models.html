@@ -87,7 +87,7 @@ run of adjust_batch on a dataset." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">batchtma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -143,7 +143,9 @@ run of <code><a href='adjust_batch.html'>adjust_batch</a></code> on a dataset.</
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>data</th>
-      <td><p>Batch-adjusted dataset</p></td>
+      <td><p>Batch-adjusted dataset (in which
+<code><a href='adjust_batch.html'>adjust_batch</a></code> has stored information on batch
+adjustment in the attribute <code>.batchtma</code>)</p></td>
     </tr>
     </table>
 
@@ -160,12 +162,32 @@ biomarker levels that differ between batches.
 Returned only if used by the model.</p></li>
 <li><p><code>adjust_parameters</code> Tibble of parameters used to
 obtain adjust biomarker levels. Parameters differ between
-methods. Note that <code>method = quantnorm</code> does not
-fit regression models and return parameters, and that
-<code>method = simple</code> only returns simple means
-as parameters and no regression models.</p></li>
+methods:</p><ul>
+<li><p><code>simple</code>, <code>standardize</code>, and <code>ipw</code>: Estimated adjustment
+parameters are a tibble with one <code>batchmean</code> per <code>marker</code>
+and <code>.batchvar</code>.</p></li>
+<li><p><code>quantreg</code> returns a tibble with numerous values per
+<code>marker</code> and <code>.batchvar</code>: unadjusted (<code>un_...</code>) and
+adjusted (<code>ad_...</code>) estimates of the lower (<code>..._lo</code>) and
+upper quantile (<code>..._hi</code>) and interquantile range (<code>..._iq</code>),
+plus the lower (<code>all_lo</code>) and upper quantiles (<code>all_hi</code>)
+across all batches.</p></li>
+<li><p><code>quantnorm</code> does not explicitly estimate parameters.</p></li>
+</ul></li>
 <li><p><code>model_fits</code> List of model fit objects, one
-per biomarker.</p></li>
+per biomarker. Models differ between methods:</p><ul>
+<li><p><code>standardize</code>: Linear regression model for the biomarker with
+<code>.batchvar</code> and <code>confounders</code> as predictors, from which
+marginal predictions of batch means for each batch are obtained.</p></li>
+<li><p><code>ipw</code>: Logistic (2 batches) or multinomial models for assignment
+to a specific batch with <code>.batchvar</code> as the response and
+<code>confounders</code> as the predictors, used to generate stabilized
+inverse-probability weights that are then used in a linear regression
+model to estimate marginally standardized batch means.</p></li>
+<li><p><code>quantreg</code>: Quantile regression with the marker as the response
+variable and <code>.batchvar</code> and <code>confounders</code> as predictors.</p></li>
+<li><p><code>simple</code> and <code>quantnorm</code> do not fit any regression models.</p></li>
+</ul></li>
 </ul>
 
 

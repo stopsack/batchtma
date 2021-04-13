@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">batchtma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
       </span>
     </div>
 
@@ -86,7 +86,7 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("remotes")  # The "remotes" package needs to be installed</span>
 <span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"stopsack/batchtma"</span><span class="op">)</span></code></pre></div>
-<p>To have vignettes like this current site be available offline via, <em>e.g.</em>, <code><a href="../articles/batchtma.html">vignette("batchtma")</a></code>, modify the last commend:</p>
+<p>To have vignettes like this current site be available offline via, <em>e.g.</em>, <code><a href="../articles/batchtma.html">vignette("batchtma")</a></code>, modify the last command:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"stopsack/batchtma"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
@@ -187,7 +187,7 @@
 <div id="quantile-regression" class="section level2">
 <h2 class="hasAnchor">
 <a href="#quantile-regression" class="anchor"></a>Quantile regression</h2>
-<p><code>method = quantreg</code>, unlike the three preceding mean-only methods, addresses two distinct properties of batches: the “offset” values (a lower quantile), potentially reflective of background signal, and an inter-quantile range, potentially reflective of the “dynamic range” of the measurement. By default, the first and third qua<strong>r</strong>tile are used.</p>
+<p><code>method = quantreg</code>, unlike the three preceding mean-only methods, addresses two distinct properties of batches: the offset values (a lower quantile), potentially reflective of background signal, and an inter-quantile range, potentially reflective of the dynamic range of the measurement. By default, the first and third qua<strong>r</strong>tile are used.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="../reference/adjust_batch.html">adjust_batch</a></span><span class="op">(</span>markers <span class="op">=</span> <span class="va">noisy_batch</span>, batch <span class="op">=</span> <span class="va">batch</span>, 
@@ -213,7 +213,7 @@
 <div id="set-up-example-data-with-confounding-present" class="section level2">
 <h2 class="hasAnchor">
 <a href="#set-up-example-data-with-confounding-present" class="anchor"></a>Set up example data with confounding present</h2>
-<p>In general, confounding means that exposure and outcome share common causes. Necessary—but not sufficient—properties of a confounder are that it needs to be associated with the exposure (<code>batch</code>) and associated with the outcome(s) (<code>markers</code>). For example, if systematically higher biomarker values due to batch effects happen to occur in a tissue microarray with a higher proportion of aggressive tumors, then batch effect-adjusted biomarker values should account for the differences in proportions of aggressive tumors.</p>
+<p>In general, confounding means that exposure and outcome share common causes. Necessary—but not sufficient—properties of a confounder are that it needs to be associated with the exposure (<code>batch</code>) and associated with the outcome(s) (<code>markers</code>). For example, if systematically higher biomarker values due to batch effects occur in a tissue microarray with a higher proportion of aggressive tumors, then batch effect-adjusted biomarker values should account for the differences in proportions of aggressive tumors.</p>
 <p>In the example, a new variable for the biomarker is generated that is affected by both confounding and batch effects. First, biomarker values with random error, <code>noisy</code>, are forced to be associated with the <code>confounder</code>, which in turn is associated with <code>batch</code>. These values, <code>noisy_conf</code>, should be considered the new “ground truth.”</p>
 <p>All following plots show color/symbol shape by <code>confounder</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
@@ -240,7 +240,7 @@
 <div id="means-from-marginal-standardization-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#means-from-marginal-standardization-1" class="anchor"></a>Means from marginal standardization</h2>
-<p><code>method = standardize</code> reduces batch effects while allowing batch means to differ because of the confounder. Batches with higher “true” biomarker values associated with the confounder, like batch B, retain higher means after batch effect adjustment.</p>
+<p><code>method = standardize</code> reduces batch effects while allowing batch means to differ because of confounders. Batches with higher true biomarker values associated with the confounders, like batch B, retain higher means after batch effect adjustment.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="../reference/adjust_batch.html">adjust_batch</a></span><span class="op">(</span>markers <span class="op">=</span> <span class="va">noisy_conf_batch</span>, batch <span class="op">=</span> <span class="va">batch</span>, 
@@ -251,7 +251,7 @@
 <div id="inverse-probability-weighting-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#inverse-probability-weighting-1" class="anchor"></a>Inverse-probability weighting</h2>
-<p><code>method = ipw</code> also reduces batch effects while allowing batch means to differ because of the confounder. As with marginal standardization, differences in variance between batches are not addressed.</p>
+<p><code>method = ipw</code> also reduces batch effects while allowing batch means to differ because of confounders. As with marginal standardization, differences in variance between batches are not addressed.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="../reference/adjust_batch.html">adjust_batch</a></span><span class="op">(</span>markers <span class="op">=</span> <span class="va">noisy_conf_batch</span>, batch <span class="op">=</span> <span class="va">batch</span>, 
@@ -262,7 +262,7 @@
 <div id="quantile-regression-1" class="section level2">
 <h2 class="hasAnchor">
 <a href="#quantile-regression-1" class="anchor"></a>Quantile regression</h2>
-<p><code>method = quantreg</code> reduces for batch effects of “offset” and “dynamic range” separately, accounting for differences in confounders. In the example, batch B with its high levels of the confounder retains somewhat higher values and a higher variance, unlike with the two preceding mean-only methods.</p>
+<p><code>method = quantreg</code> reduces for batch effects of offset and dynamic range separately, accounting for differences in confounders. In the example, batch B with its high levels of the <code>confounder</code> retains somewhat higher values and a higher variance, unlike with the two preceding mean-only methods.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="../reference/adjust_batch.html">adjust_batch</a></span><span class="op">(</span>markers <span class="op">=</span> <span class="va">noisy_conf_batch</span>, batch <span class="op">=</span> <span class="va">batch</span>, 
@@ -276,7 +276,7 @@
 <div id="simple-means-1" class="section level3">
 <h3 class="hasAnchor">
 <a href="#simple-means-1" class="anchor"></a>Simple means</h3>
-<p><code>method = simple</code> leads to all batches having the same mean after adjustment. In the example, this method ignores that batch B should have higher values because of higher values of the confounder.</p>
+<p><code>method = simple</code> leads to all batches having the same mean after adjustment. In the example, this method ignores that batch B should have higher values because of higher values of the <code>confounder</code>.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op">%&gt;%</span> 
   <span class="fu"><a href="../reference/adjust_batch.html">adjust_batch</a></span><span class="op">(</span>markers <span class="op">=</span> <span class="va">noisy_conf_batch</span>, batch <span class="op">=</span> <span class="va">batch</span>, 
@@ -307,7 +307,9 @@
 <div id="missing-values" class="section level2">
 <h2 class="hasAnchor">
 <a href="#missing-values" class="anchor"></a>Missing values</h2>
-<p>batchtma can handle missing biomarker values, which is a common phenomenon in tissue microarray studies. This situation is different from gene expression studies, where measured genes are typically measured on all batches (<em>e.g.</em>, microarrays). No coding changes are needed. If multiple biomarkers are batch-adjusted with one call of <code><a href="../reference/adjust_batch.html">adjust_batch(markers = c(biomarker_a, biomarker_b, biomarker_c), ...)</a></code> and different rows (e.g., tumors) have missing values for different columns (biomarkers), no values will be excluded because of missingness in another marker.</p>
+<p>batchtma can handle missing biomarker values, which is a common phenomenon in tissue microarray studies. No coding changes are needed.</p>
+<p>This situation is different from gene expression studies, where measured genes are typically measured on all batches (<em>e.g.</em>, microarrays) and methods like ComBat can “borrow” information from the other markers (genes) measured on the same batch.</p>
+<p>In batchtma, adjustments are done separately for each marker, even if multiple biomarkers are batch-adjusted with one call of <code><a href="../reference/adjust_batch.html">adjust_batch(markers = c(biomarker_a, biomarker_b, biomarker_c), ...)</a></code> and different rows (e.g., tumors) have missing values for different columns (biomarkers). Thus, no values will be excluded because of missingness in another marker.</p>
 </div>
 <div id="model-diagnostics" class="section level2">
 <h2 class="hasAnchor">
@@ -375,7 +377,7 @@
 <span class="co">#&gt; Residual standard error: 9.275 on 395 degrees of freedom</span>
 <span class="co">#&gt; Multiple R-squared:  0.7684, Adjusted R-squared:  0.7661 </span>
 <span class="co">#&gt; F-statistic: 327.7 on 4 and 395 DF,  p-value: &lt; 2.2e-16</span></code></pre></div>
-<p>The marginally standardized means per batch are the adjustment parameters estimates by this procedure. They are returned by <code><a href="../reference/diagnose_models.html">diagnose_models()</a></code> as <code>adjust_parameters</code>:</p>
+<p>The marginally standardized means per batch are the adjustment parameters estimated by this procedure. They are returned by <code><a href="../reference/diagnose_models.html">diagnose_models()</a></code> as <code>adjust_parameters</code>:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/diagnose_models.html">diagnose_models</a></span><span class="op">(</span><span class="va">df2</span><span class="op">)</span><span class="op">$</span><span class="va">adjust_parameters</span>
 <span class="co">#&gt; # A tibble: 4 x 3</span>
