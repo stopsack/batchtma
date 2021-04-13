@@ -466,8 +466,8 @@ batch_quantnorm <- function(var, batch) {
 #'   * \code{_adj5} from \code{method = quantreg}
 #'   * \code{_adj6} from \code{method = quantnorm}
 #' @param ipw_truncate Optional and used for \code{method = ipw} only:
-#'   Lower and upper extreme quantiles to truncate stabilized
-#'   weights at. Defaults to \code{c(0.025, 0.975)}.
+#'   Lower and upper quantiles for truncation of stabilized
+#'   weights. Defaults to \code{c(0.025, 0.975)}.
 #' @param quantreg_tau Optional and used for \code{method = quantreg} only:
 #'   Quantiles to scale. Defaults to \code{c(0.25, 0.75)}.
 #' @param quantreg_method Optional and used for \code{method = quantreg} only:

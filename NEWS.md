@@ -1,3 +1,8 @@
+# batchtma 0.1.5
+
+* Expand documentation for `diagnose_models()`.
+
+
 # batchtma 0.1.4
 
 * Bioconductor limma dependency added for `remotes::install_github()``

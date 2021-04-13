@@ -23,7 +23,7 @@ Batchtma can be installed from [GitHub](https://github.com/) using:
 remotes::install_github("stopsack/batchtma")
 ```
 
-To have vignettes like this current site be available offline via, *e.g.*, `vignette("batchtma")`, modify the last commend:
+To have vignettes like this current site be available offline via, *e.g.*, `vignette("batchtma")`, modify the last command:
 
 ```{r, eval = FALSE}
 remotes::install_github("stopsack/batchtma", build_vignettes = TRUE)
@@ -122,7 +122,7 @@ df %>%
 
 ## Quantile regression
 
-`method = quantreg`, unlike the three preceding mean-only methods, addresses two distinct properties of batches: the "offset" values (a lower quantile), potentially reflective of background signal, and an inter-quantile range, potentially reflective of the "dynamic range" of the measurement. By default, the first and third qua**r**tile are used.
+`method = quantreg`, unlike the three preceding mean-only methods, addresses two distinct properties of batches: the offset values (a lower quantile), potentially reflective of background signal, and an inter-quantile range, potentially reflective of the dynamic range of the measurement. By default, the first and third qua**r**tile are used.
 
 ```{r}
 df %>% 
@@ -147,7 +147,7 @@ df %>%
 
 ## Set up example data with confounding present
 
-In general, confounding means that exposure and outcome share common causes. Necessary---but not sufficient---properties of a confounder are that it needs to be associated with the exposure (`batch`) and associated with the outcome(s) (`markers`). For example, if systematically higher biomarker values due to batch effects happen to occur in a tissue microarray with a higher proportion of aggressive tumors, then batch effect-adjusted biomarker values should account for the differences in proportions of aggressive tumors.
+In general, confounding means that exposure and outcome share common causes. Necessary---but not sufficient---properties of a confounder are that it needs to be associated with the exposure (`batch`) and associated with the outcome(s) (`markers`). For example, if systematically higher biomarker values due to batch effects occur in a tissue microarray with a higher proportion of aggressive tumors, then batch effect-adjusted biomarker values should account for the differences in proportions of aggressive tumors.
 
 In the example, a new variable for the biomarker is generated that is affected by both confounding and batch effects. First, biomarker values with random error, `noisy`, are forced to be associated with the `confounder`, which in turn is associated with `batch`. These values, `noisy_conf`, should be considered the new "ground truth."
 
@@ -182,7 +182,7 @@ The following examples show to what extent batch effects can be removed from `no
 
 ## Means from marginal standardization
 
-`method = standardize` reduces batch effects while allowing batch means to differ because of the confounder. Batches with higher "true" biomarker values associated with the confounder, like batch B, retain higher means after batch effect adjustment.
+`method = standardize` reduces batch effects while allowing batch means to differ because of confounders. Batches with higher true biomarker values associated with the confounders, like batch B, retain higher means after batch effect adjustment.
 
 ```{r}
 df %>% 
@@ -194,7 +194,7 @@ df %>%
 
 ## Inverse-probability weighting
 
-`method = ipw` also reduces batch effects while allowing batch means to differ because of the confounder. As with marginal standardization, differences in variance between batches are not addressed.
+`method = ipw` also reduces batch effects while allowing batch means to differ because of confounders. As with marginal standardization, differences in variance between batches are not addressed.
 
 ```{r}
 df %>% 
@@ -206,7 +206,7 @@ df %>%
 
 ## Quantile regression
 
-`method = quantreg` reduces for batch effects of "offset" and "dynamic range" separately, accounting for differences in confounders. In the example, batch B with its high levels of the confounder retains somewhat higher values and a higher variance, unlike with the two preceding mean-only methods.
+`method = quantreg` reduces for batch effects of offset and dynamic range separately, accounting for differences in confounders. In the example, batch B with its high levels of the `confounder` retains somewhat higher values and a higher variance, unlike with the two preceding mean-only methods.
 
 ```{r}
 df %>% 
@@ -220,7 +220,7 @@ df %>%
 
 ### Simple means
 
-`method = simple` leads to all batches having the same mean after adjustment. In the example, this method ignores that batch B should have higher values because of higher values of the confounder.
+`method = simple` leads to all batches having the same mean after adjustment. In the example, this method ignores that batch B should have higher values because of higher values of the `confounder`.
 
 ```{r}
 df %>% 
@@ -246,7 +246,11 @@ df %>%
 
 ## Missing values
 
-batchtma can handle missing biomarker values, which is a common phenomenon in tissue microarray studies. This situation is different from gene expression studies, where measured genes are typically measured on all batches (*e.g.*, microarrays). No coding changes are needed. If multiple biomarkers are batch-adjusted with one call of `adjust_batch(markers = c(biomarker_a, biomarker_b, biomarker_c), ...)` and different rows (e.g., tumors) have missing values for different columns (biomarkers), no values will be excluded because of missingness in another marker.
+batchtma can handle missing biomarker values, which is a common phenomenon in tissue microarray studies. No coding changes are needed. 
+
+This situation is different from gene expression studies, where measured genes are typically measured on all batches (*e.g.*, microarrays) and methods like ComBat can "borrow" information from the other markers (genes) measured on the same batch.
+
+In batchtma, adjustments are done separately for each marker, even if multiple biomarkers are batch-adjusted with one call of `adjust_batch(markers = c(biomarker_a, biomarker_b, biomarker_c), ...)` and different rows (e.g., tumors) have missing values for different columns (biomarkers). Thus, no values will be excluded because of missingness in another marker.
 
 
 ## Model diagnostics
@@ -272,7 +276,7 @@ fit <- diagnose_models(data = df2)$model_fits[[1]][[1]]
 summary(fit)
 ```
 
-The marginally standardized means per batch are the adjustment parameters estimates by this procedure. They are returned by `diagnose_models()` as `adjust_parameters`:
+The marginally standardized means per batch are the adjustment parameters estimated by this procedure. They are returned by `diagnose_models()` as `adjust_parameters`:
 
 ```{r}
 diagnose_models(df2)$adjust_parameters

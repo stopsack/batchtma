@@ -69,8 +69,8 @@ after batch adjustment. Defaults to \code{"_adjX"}, with
 }}
 
 \item{ipw_truncate}{Optional and used for \code{method = ipw} only:
-Lower and upper extreme quantiles to truncate stabilized
-weights at. Defaults to \code{c(0.025, 0.975)}.}
+Lower and upper quantiles for truncation of stabilized
+weights. Defaults to \code{c(0.025, 0.975)}.}
 
 \item{quantreg_tau}{Optional and used for \code{method = quantreg} only:
 Quantiles to scale. Defaults to \code{c(0.25, 0.75)}.}

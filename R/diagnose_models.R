@@ -7,7 +7,9 @@
 #' Information is only available about the most recent
 #' run of \code{\link[batchtma]{adjust_batch}} on a dataset.
 #'
-#' @param data Batch-adjusted dataset
+#' @param data Batch-adjusted dataset (in which
+#' \code{\link[batchtma]{adjust_batch}} has stored information on batch
+#' adjustment in the attribute \code{.batchtma})
 #'
 #' @return List:
 #' * \code{adjust_method} Method used for batch adjustment
@@ -20,12 +22,34 @@
 #'   Returned only if used by the model.
 #' * \code{adjust_parameters} Tibble of parameters used to
 #'   obtain adjust biomarker levels. Parameters differ between
-#'   methods. Note that \code{method = quantnorm} does not
-#'   fit regression models and return parameters, and that
-#'   \code{method = simple} only returns simple means
-#'   as parameters and no regression models.
+#'   methods:
+#'
+#'     + \code{simple}, \code{standardize}, and \code{ipw}: Estimated adjustment
+#'       parameters are a tibble with one \code{batchmean} per \code{marker}
+#'       and \code{.batchvar}.
+#'     + \code{quantreg} returns a tibble with numerous values per
+#'       \code{marker} and \code{.batchvar}: unadjusted (\code{un_...}) and
+#'       adjusted (\code{ad_...}) estimates of the lower (\code{..._lo}) and
+#'       upper quantile (\code{..._hi}) and interquantile range (\code{..._iq}),
+#'       plus the lower (\code{all_lo}) and upper quantiles (\code{all_hi})
+#'       across all batches.
+#'     + \code{quantnorm} does not explicitly estimate parameters.
+#'
 #' * \code{model_fits} List of model fit objects, one
-#'   per biomarker.
+#'   per biomarker. Models differ between methods:
+#'
+#'     + \code{standardize}: Linear regression model for the biomarker with
+#'       \code{.batchvar} and \code{confounders} as predictors, from which
+#'       marginal predictions of batch means for each batch are obtained.
+#'     + \code{ipw}: Logistic (2 batches) or multinomial models for assignment
+#'       to a specific batch with \code{.batchvar} as the response and
+#'       \code{confounders} as the predictors, used to generate stabilized
+#'       inverse-probability weights that are then used in a linear regression
+#'       model to estimate marginally standardized batch means.
+#'     + \code{quantreg}: Quantile regression with the marker as the response
+#'       variable and \code{.batchvar} and \code{confounders} as predictors.
+#'     + \code{simple} and \code{quantnorm} do not fit any regression models.
+#'
 #' @export
 #' @examples
 #' # Data frame with two batches
