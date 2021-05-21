@@ -19,13 +19,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-<<<<<<< HEAD
         - { os: windows-latest, r: 'release'}
         - { os: macOS-latest, r: 'release'}
-=======
-        - { os: windows-latest, r: 'release', bioc: 'release'}
-        - { os: macOS-latest, r: 'release', bioc: 'release'}
->>>>>>> 7101785469719b67f7c9a4a3891263f8ee3e8abc
          #- { os: ubuntu-16.04, r: 'release', bioc: 'release', cran: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
         #- { os: ubuntu-latest, r: 'release', image: 'bioconductor/bioconductor_docker:release'}
 
