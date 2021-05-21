@@ -19,8 +19,8 @@ jobs:
       fail-fast: false
       matrix:
         config:
-        - { os: windows-latest, r: 'release', bioc: '3.12'}
-        - { os: macOS-latest, r: 'release', bioc: '3.12'}
+        - { os: windows-latest, r: 'release'}
+        - { os: macOS-latest, r: 'release'}
          #- { os: ubuntu-16.04, r: 'release', bioc: 'release', cran: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
         #- { os: ubuntu-latest, r: 'release', image: 'bioconductor/bioconductor_docker:release'}
 
@@ -53,7 +53,7 @@ jobs:
         if: matrix.config.image == null
         run: |
           install.packages('BiocManager')
-          BiocManager::install(version = "${{ matrix.config.bioc }}", ask = FALSE)
+          BiocManager::install(ask = FALSE)
         shell: Rscript {0}
 
       - name: Query dependencies
