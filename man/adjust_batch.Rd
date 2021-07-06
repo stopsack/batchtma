@@ -169,8 +169,8 @@ adjust_batch(
 }
 \references{
 Stopsack KH, Tyekucheva S, Wang M, Gerke TA, Vaselkiv JB, Penney KL,
-Kantoff PW, Finn SP, Fiorentino M, Loda M, Lotan TL, Parmigiani G\\emph{,
-Mucci LA\} (\* equal contribution). Extent, impact, and mitigation of
+Kantoff PW, Finn SP, Fiorentino M, Loda M, Lotan TL, Parmigiani G+,
+Mucci LA+ (+ equal contribution). Extent, impact, and mitigation of
 batch effects in tumor biomarker studies using tissue microarrays.
 bioRxiv 2021.06.29.450369; doi: https://doi.org/10.1101/2021.06.29.450369
 (This R package, all methods descriptions, and further recommendations.)
