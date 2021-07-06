@@ -525,6 +525,13 @@ batch_quantnorm <- function(var, batch) {
 #' @export
 #'
 #' @references
+#' Stopsack KH, Tyekucheva S, Wang M, Gerke TA, Vaselkiv JB, Penney KL,
+#' Kantoff PW, Finn SP, Fiorentino M, Loda M, Lotan TL, Parmigiani G\*,
+#' Mucci LA\* (\* equal contribution). Extent, impact, and mitigation of
+#' batch effects in tumor biomarker studies using tissue microarrays.
+#' bioRxiv 2021.06.29.450369; doi: https://doi.org/10.1101/2021.06.29.450369
+#' (This R package, all methods descriptions, and further recommendations.)
+#'
 #' Rosner B, Cook N, Portman R, Daniels S, Falkner B.
 #' Determination of blood pressure percentiles in
 #' normal-weight children: some methodological issues.
@@ -535,12 +542,6 @@ batch_quantnorm <- function(var, batch) {
 #' A comparison of normalization methods for high density
 #' oligonucleotide array data based on variance and bias.
 #' Bioinformatics 2003;19:185–193. (\code{method = quantnorm})
-#'
-#' Stopsack KH et al. Batch effects in tumor
-#' biomarker studies using tissue microarrays: Extent,
-#' impact, and remediation. In preparation.
-#' (This R package; \code{method = c(standardize, ipw,
-#' quantreg)}; method comparisons)
 #'
 #' @author Konrad H. Stopsack \url{stopsack@mskcc.org}
 #' @seealso \url{https://stopsack.github.io/batchtma}

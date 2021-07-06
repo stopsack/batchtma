@@ -1,3 +1,8 @@
+# batchtma 0.1.6
+
+* Add reference to accompanying [manuscript on bioRxiv](https://doi.org/10.1101/2021.06.29.450369)
+
+
 # batchtma 0.1.5
 
 * Expand documentation for `diagnose_models()`.
