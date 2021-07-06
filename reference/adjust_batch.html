@@ -61,7 +61,6 @@ error between levels of batch." />
 
 
 
-
   
 
   
@@ -84,7 +83,7 @@ error between levels of batch." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">batchtma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.5</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
       </span>
     </div>
 
@@ -274,7 +273,13 @@ confounders are based on adjustment parameters derived from the
 other observations in a batch with non-missing confounders.</p>
     <h2 class="hasAnchor" id="references"><a class="anchor" href="#references"></a>References</h2>
 
-    <p>Rosner B, Cook N, Portman R, Daniels S, Falkner B.
+    <p>Stopsack KH, Tyekucheva S, Wang M, Gerke TA, Vaselkiv JB, Penney KL,
+Kantoff PW, Finn SP, Fiorentino M, Loda M, Lotan TL, Parmigiani G+,
+Mucci LA+ (+ equal contribution). Extent, impact, and mitigation of
+batch effects in tumor biomarker studies using tissue microarrays.
+bioRxiv 2021.06.29.450369; doi: https://doi.org/10.1101/2021.06.29.450369
+(This R package, all methods descriptions, and further recommendations.)</p>
+<p>Rosner B, Cook N, Portman R, Daniels S, Falkner B.
 Determination of blood pressure percentiles in
 normal-weight children: some methodological issues.
 Am J Epidemiol 2008;167(6):653-66. (Basis for
@@ -283,11 +288,6 @@ Am J Epidemiol 2008;167(6):653-66. (Basis for
 A comparison of normalization methods for high density
 oligonucleotide array data based on variance and bias.
 Bioinformatics 2003;19:185–193. (<code>method = quantnorm</code>)</p>
-<p>Stopsack KH et al. Batch effects in tumor
-biomarker studies using tissue microarrays: Extent,
-impact, and remediation. In preparation.
-(This R package; <code>method = c(standardize, ipw,
-quantreg)</code>; method comparisons)</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
     <div class='dont-index'><p><a href='https://stopsack.github.io/batchtma'>https://stopsack.github.io/batchtma</a></p></div>
@@ -347,7 +347,6 @@ quantreg)</code>; method comparisons)</p>
 <span class='r-in'>  confounders <span class='op'>=</span> <span class='va'>confounder</span>,</span>
 <span class='r-in'>  suffix <span class='op'>=</span> <span class='st'>"_batchadjusted"</span></span>
 <span class='r-in'><span class='op'>)</span></span>
-<span class='r-wrn co'><span class='r-pr'>#&gt;</span> <span class='warning'>Warning: </span>undefined subclass "numericVector" of class "Mnumeric"; definition not updated</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span>    tma biomarker confounder biomarker_batchadjusted</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> 1    1  1.403751  2.8989230                3.095246</span>
 <span class='r-out co'><span class='r-pr'>#&gt;</span> 2    2  6.171665  7.7838043                4.313937</span>
