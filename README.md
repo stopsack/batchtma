@@ -1,7 +1,7 @@
 
-# The `batchtma` package
+# The batchtma R package
 
-The batchtma package provides functions for batch effect-adjusting
+The batchtma package provides R functions for batch effect-adjusting
 biomarker data.
 
 See the [batchtma package documentation
