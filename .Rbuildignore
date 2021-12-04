@@ -7,6 +7,8 @@
 ^pkgdown$
 ^dev$
 ^.github$
-index.md
-index.Rmd
-
+README.md$
+README.Rmd$
+index.md$
+index.Rmd$
+NEWS.md$

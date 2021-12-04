@@ -40,7 +40,5 @@ Suggests:
     knitr,
     rmarkdown,
     tidyverse
-Remotes:
-    bioc::limma
 VignetteBuilder: knitr
 URL: https://stopsack.github.io/batchtma, https://github.com/stopsack/batchtma
