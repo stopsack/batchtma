@@ -92,7 +92,5 @@ doi:10.1093/bioinformatics/btw538
 More powerful visualizations of batch effects exist
 in the BatchQC package:
 
-\url{https://doi.org/10.1093/bioinformatics/btw538}
-
 \url{http://bioconductor.org/packages/release/bioc/html/BatchQC.html}
 }
