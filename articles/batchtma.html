@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">batchtma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.6</span>
       </span>
     </div>
 
@@ -72,16 +72,16 @@
       <h1 data-toc-skip>Get Started: Methods to address batch effects</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/stopsack/batchtma/blob/master/vignettes/batchtma.Rmd" class="external-link"><code>vignettes/batchtma.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/stopsack/batchtma/blob/HEAD/vignettes/batchtma.Rmd" class="external-link"><code>vignettes/batchtma.Rmd</code></a></small>
       <div class="hidden name"><code>batchtma.Rmd</code></div>
 
     </div>
 
     
     
-<div id="installation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#installation" class="anchor" aria-hidden="true"></a>Installation</h1>
+<div class="section level1">
+<h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h1>
 <p>Batchtma can be installed from <a href="https://github.com/" class="external-link">GitHub</a> using:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="co"># install.packages("remotes")  # The "remotes" package needs to be installed</span>
@@ -90,9 +90,9 @@
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"stopsack/batchtma"</span>, build_vignettes <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="set-up-and-plot-example-data" class="section level1">
-<h1 class="hasAnchor">
-<a href="#set-up-and-plot-example-data" class="anchor" aria-hidden="true"></a>Set up and plot example data</h1>
+<div class="section level1">
+<h1 id="set-up-and-plot-example-data">Set up and plot example data<a class="anchor" aria-label="anchor" href="#set-up-and-plot-example-data"></a>
+</h1>
 <p>We load the batchtma package and, for convenience with data handling and plotting, the tidyverse package:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stopsack.github.io/batchtma">batchtma</a></span><span class="op">)</span>
@@ -114,27 +114,27 @@
   noisy <span class="op">=</span> <span class="va">true</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>max <span class="op">=</span> <span class="va">true</span> <span class="op">/</span> <span class="fl">3</span>, n <span class="op">=</span> <span class="fl">400</span><span class="op">)</span> <span class="op">*</span> <span class="fl">4</span><span class="op">)</span>
 
 <span class="va">df</span>
-<span class="co">#&gt; # A tibble: 400 × 6</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 400 × 6</span></span>
 <span class="co">#&gt;    batch  batchnum person random  true noisy</span>
-<span class="co">#&gt;    &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;</span>
-<span class="co">#&gt;  1 batchA        1 a      -0.850     2  4.63</span>
-<span class="co">#&gt;  2 batchB        5 a       1.15      2  2.37</span>
-<span class="co">#&gt;  3 batchC        2 a      -0.364     2  4.41</span>
-<span class="co">#&gt;  4 batchD        3 a       1.53      2  3.54</span>
-<span class="co">#&gt;  5 batchA        1 a       1.76      2  3.05</span>
-<span class="co">#&gt;  6 batchB        5 a      -1.82      2  3.20</span>
-<span class="co">#&gt;  7 batchC        2 a       0.112     2  3.88</span>
-<span class="co">#&gt;  8 batchD        3 a       1.57      2  2.22</span>
-<span class="co">#&gt;  9 batchA        1 a       0.206     2  2.90</span>
-<span class="co">#&gt; 10 batchB        5 a      -0.174     2  3.82</span>
-<span class="co">#&gt; # … with 390 more rows</span></code></pre></div>
+<span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> batchA        1 a      -<span style="color: #BB0000;">0.850</span>     2  4.63</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> batchB        5 a       1.15      2  2.37</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> batchC        2 a      -<span style="color: #BB0000;">0.364</span>     2  4.41</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> batchD        3 a       1.53      2  3.54</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> batchA        1 a       1.76      2  3.05</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> batchB        5 a      -<span style="color: #BB0000;">1.82</span>      2  3.20</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> batchC        2 a       0.112     2  3.88</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> batchD        3 a       1.57      2  2.22</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> batchA        1 a       0.206     2  2.90</span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">10</span> batchB        5 a      -<span style="color: #BB0000;">0.174</span>     2  3.82</span>
+<span class="co">#&gt; <span style="color: #949494;"># … with 390 more rows</span></span></code></pre></div>
 <p>We plot the biomarker values (<em>y</em>-axis) by batch (<em>x</em>-axis), using the <code><a href="../reference/plot_batch.html">plot_batch()</a></code> function. Color/shape symbolizes which participant/tumor the measurements came from. Boxes span from the 25th to the 75th percentile (interquartile range); thick lines indicate medians; asterisks indicate means.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu"><a href="../reference/plot_batch.html">plot_batch</a></span><span class="op">(</span>marker <span class="op">=</span> <span class="va">noisy</span>, batch <span class="op">=</span> <span class="va">batch</span>, color <span class="op">=</span> <span class="va">person</span><span class="op">)</span></code></pre></div>
 <p><img src="batchtma_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
-<div id="add-batch-effects" class="section level2">
-<h2 class="hasAnchor">
-<a href="#add-batch-effects" class="anchor" aria-hidden="true"></a>Add batch effects</h2>
+<div class="section level2">
+<h2 id="add-batch-effects">Add batch effects<a class="anchor" aria-label="anchor" href="#add-batch-effects"></a>
+</h2>
 <p>We add systematic differences between batches such that there is differential measurement error between batches in terms of mean and variance. As shown above, true values were the same beyond random error.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
@@ -148,12 +148,12 @@
 <p><img src="batchtma_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
 </div>
 </div>
-<div id="perform-batch-effect-adjustment-without-confounders" class="section level1">
-<h1 class="hasAnchor">
-<a href="#perform-batch-effect-adjustment-without-confounders" class="anchor" aria-hidden="true"></a>Perform batch effect adjustment without confounders</h1>
-<div id="simple-means" class="section level2">
-<h2 class="hasAnchor">
-<a href="#simple-means" class="anchor" aria-hidden="true"></a>Simple means</h2>
+<div class="section level1">
+<h1 id="perform-batch-effect-adjustment-without-confounders">Perform batch effect adjustment without confounders<a class="anchor" aria-label="anchor" href="#perform-batch-effect-adjustment-without-confounders"></a>
+</h1>
+<div class="section level2">
+<h2 id="simple-means">Simple means<a class="anchor" aria-label="anchor" href="#simple-means"></a>
+</h2>
 <p><code>method = simple</code> calculates the mean for each batch and subtracts the difference between this mean and the grand mean, such that all batches end up having a mean equivalent to the grand mean. Differences in variance between batches will remain, if they exist (as in this example).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -162,9 +162,9 @@
   <span class="fu"><a href="../reference/plot_batch.html">plot_batch</a></span><span class="op">(</span>marker <span class="op">=</span> <span class="va">noisy_batch_adj2</span>, batch <span class="op">=</span> <span class="va">batch</span>, color <span class="op">=</span> <span class="va">person</span><span class="op">)</span></code></pre></div>
 <p><img src="batchtma_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
 </div>
-<div id="means-from-marginal-standardization" class="section level2">
-<h2 class="hasAnchor">
-<a href="#means-from-marginal-standardization" class="anchor" aria-hidden="true"></a>Means from marginal standardization</h2>
+<div class="section level2">
+<h2 id="means-from-marginal-standardization">Means from marginal standardization<a class="anchor" aria-label="anchor" href="#means-from-marginal-standardization"></a>
+</h2>
 <p><code>method = standardize</code> performs marginal standardization by fitting a linear regression model for biomarker values with <code>batch</code> and <code>confounders</code> as predictors, and obtains the marginal means per batch if they had the same distribution of <code>confounders</code>. Differences between these marginal means and the grand mean are subtracted as in <code>method = simple</code>. In this example, the confounder is a random variable, and the results are essentially the same as for <code>method = simple</code>.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -173,9 +173,9 @@
   <span class="fu"><a href="../reference/plot_batch.html">plot_batch</a></span><span class="op">(</span>marker <span class="op">=</span> <span class="va">noisy_batch_adj3</span>, batch <span class="op">=</span> <span class="va">batch</span>, color <span class="op">=</span> <span class="va">person</span><span class="op">)</span></code></pre></div>
 <p><img src="batchtma_files/figure-html/unnamed-chunk-9-1.png" width="700"></p>
 </div>
-<div id="inverse-probability-weighting" class="section level2">
-<h2 class="hasAnchor">
-<a href="#inverse-probability-weighting" class="anchor" aria-hidden="true"></a>Inverse-probability weighting</h2>
+<div class="section level2">
+<h2 id="inverse-probability-weighting">Inverse-probability weighting<a class="anchor" aria-label="anchor" href="#inverse-probability-weighting"></a>
+</h2>
 <p><code>method = ipw</code> predicts the probability of a measurement being from a specific batch, given the <code>confounders</code>. Mean differences between batches are obtained from a marginal structural model with stabilized inverse-probability weights and then used as in the two preceding methods. Again, the confounder is merely a random variable in this example.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -184,9 +184,9 @@
   <span class="fu"><a href="../reference/plot_batch.html">plot_batch</a></span><span class="op">(</span>marker <span class="op">=</span> <span class="va">noisy_batch_adj4</span>, batch <span class="op">=</span> <span class="va">batch</span>, color <span class="op">=</span> <span class="va">person</span><span class="op">)</span></code></pre></div>
 <p><img src="batchtma_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
 </div>
-<div id="quantile-regression" class="section level2">
-<h2 class="hasAnchor">
-<a href="#quantile-regression" class="anchor" aria-hidden="true"></a>Quantile regression</h2>
+<div class="section level2">
+<h2 id="quantile-regression">Quantile regression<a class="anchor" aria-label="anchor" href="#quantile-regression"></a>
+</h2>
 <p><code>method = quantreg</code>, unlike the three preceding mean-only methods, addresses two distinct properties of batches: the offset values (a lower quantile), potentially reflective of background signal, and an inter-quantile range, potentially reflective of the dynamic range of the measurement. By default, the first and third qua<strong>r</strong>tile are used.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -195,9 +195,9 @@
   <span class="fu"><a href="../reference/plot_batch.html">plot_batch</a></span><span class="op">(</span>marker <span class="op">=</span> <span class="va">noisy_batch_adj5</span>, batch <span class="op">=</span> <span class="va">batch</span>, color <span class="op">=</span> <span class="va">person</span><span class="op">)</span></code></pre></div>
 <p><img src="batchtma_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 </div>
-<div id="quantile-normalization" class="section level2">
-<h2 class="hasAnchor">
-<a href="#quantile-normalization" class="anchor" aria-hidden="true"></a>Quantile normalization</h2>
+<div class="section level2">
+<h2 id="quantile-normalization">Quantile normalization<a class="anchor" aria-label="anchor" href="#quantile-normalization"></a>
+</h2>
 <p><code>method = quantnorm</code> performs quantile normalization: values are ranked within each batch, and then each rank is assigned the mean per rank across batches. Quantile normalization ensures that all batches have near-identical biomarker distributions. However, quantile normalization does not allow for accounting for <code>confounders</code>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -207,12 +207,12 @@
 <p><img src="batchtma_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
 </div>
 </div>
-<div id="perform-batch-effect-adjustment-in-the-presence-of-confounding" class="section level1">
-<h1 class="hasAnchor">
-<a href="#perform-batch-effect-adjustment-in-the-presence-of-confounding" class="anchor" aria-hidden="true"></a>Perform batch effect adjustment in the presence of confounding</h1>
-<div id="set-up-example-data-with-confounding-present" class="section level2">
-<h2 class="hasAnchor">
-<a href="#set-up-example-data-with-confounding-present" class="anchor" aria-hidden="true"></a>Set up example data with confounding present</h2>
+<div class="section level1">
+<h1 id="perform-batch-effect-adjustment-in-the-presence-of-confounding">Perform batch effect adjustment in the presence of confounding<a class="anchor" aria-label="anchor" href="#perform-batch-effect-adjustment-in-the-presence-of-confounding"></a>
+</h1>
+<div class="section level2">
+<h2 id="set-up-example-data-with-confounding-present">Set up example data with confounding present<a class="anchor" aria-label="anchor" href="#set-up-example-data-with-confounding-present"></a>
+</h2>
 <p>In general, confounding means that exposure and outcome share common causes. Necessary—but not sufficient—properties of a confounder are that it needs to be associated with the exposure (<code>batch</code>) and associated with the outcome(s) (<code>markers</code>). For example, if systematically higher biomarker values due to batch effects occur in a tissue microarray with a higher proportion of aggressive tumors, then batch effect-adjusted biomarker values should account for the differences in proportions of aggressive tumors.</p>
 <p>In the example, a new variable for the biomarker is generated that is affected by both confounding and batch effects. First, biomarker values with random error, <code>noisy</code>, are forced to be associated with the <code>confounder</code>, which in turn is associated with <code>batch</code>. These values, <code>noisy_conf</code>, should be considered the new “ground truth.”</p>
 <p>All following plots show color/symbol shape by <code>confounder</code>.</p>
@@ -237,9 +237,9 @@
 <p><img src="batchtma_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
 <p>The following examples show to what extent batch effects can be removed from <code>noisy_conf_batch</code> to recover the “ground truth,” <code>noisy_conf</code>.</p>
 </div>
-<div id="means-from-marginal-standardization-1" class="section level2">
-<h2 class="hasAnchor">
-<a href="#means-from-marginal-standardization-1" class="anchor" aria-hidden="true"></a>Means from marginal standardization</h2>
+<div class="section level2">
+<h2 id="means-from-marginal-standardization-1">Means from marginal standardization<a class="anchor" aria-label="anchor" href="#means-from-marginal-standardization-1"></a>
+</h2>
 <p><code>method = standardize</code> reduces batch effects while allowing batch means to differ because of confounders. Batches with higher true biomarker values associated with the confounders, like batch B, retain higher means after batch effect adjustment.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -248,9 +248,9 @@
   <span class="fu"><a href="../reference/plot_batch.html">plot_batch</a></span><span class="op">(</span>marker <span class="op">=</span> <span class="va">noisy_conf_batch_adj3</span>, batch <span class="op">=</span> <span class="va">batch</span>, color <span class="op">=</span> <span class="va">confounder</span><span class="op">)</span></code></pre></div>
 <p><img src="batchtma_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
 </div>
-<div id="inverse-probability-weighting-1" class="section level2">
-<h2 class="hasAnchor">
-<a href="#inverse-probability-weighting-1" class="anchor" aria-hidden="true"></a>Inverse-probability weighting</h2>
+<div class="section level2">
+<h2 id="inverse-probability-weighting-1">Inverse-probability weighting<a class="anchor" aria-label="anchor" href="#inverse-probability-weighting-1"></a>
+</h2>
 <p><code>method = ipw</code> also reduces batch effects while allowing batch means to differ because of confounders. As with marginal standardization, differences in variance between batches are not addressed.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -259,9 +259,9 @@
   <span class="fu"><a href="../reference/plot_batch.html">plot_batch</a></span><span class="op">(</span>marker <span class="op">=</span> <span class="va">noisy_conf_batch_adj4</span>, batch <span class="op">=</span> <span class="va">batch</span>, color <span class="op">=</span> <span class="va">confounder</span><span class="op">)</span></code></pre></div>
 <p><img src="batchtma_files/figure-html/unnamed-chunk-16-1.png" width="700"></p>
 </div>
-<div id="quantile-regression-1" class="section level2">
-<h2 class="hasAnchor">
-<a href="#quantile-regression-1" class="anchor" aria-hidden="true"></a>Quantile regression</h2>
+<div class="section level2">
+<h2 id="quantile-regression-1">Quantile regression<a class="anchor" aria-label="anchor" href="#quantile-regression-1"></a>
+</h2>
 <p><code>method = quantreg</code> reduces for batch effects of offset and dynamic range separately, accounting for differences in confounders. In the example, batch B with its high levels of the <code>confounder</code> retains somewhat higher values and a higher variance, unlike with the two preceding mean-only methods.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -270,12 +270,12 @@
   <span class="fu"><a href="../reference/plot_batch.html">plot_batch</a></span><span class="op">(</span>marker <span class="op">=</span> <span class="va">noisy_conf_batch_adj5</span>, batch <span class="op">=</span> <span class="va">batch</span>, color <span class="op">=</span> <span class="va">confounder</span><span class="op">)</span></code></pre></div>
 <p><img src="batchtma_files/figure-html/unnamed-chunk-17-1.png" width="700"></p>
 </div>
-<div id="for-comparison-batch-effect-adjustment-ignoring-confounding" class="section level2">
-<h2 class="hasAnchor">
-<a href="#for-comparison-batch-effect-adjustment-ignoring-confounding" class="anchor" aria-hidden="true"></a>For comparison: Batch effect adjustment ignoring confounding</h2>
-<div id="simple-means-1" class="section level3">
-<h3 class="hasAnchor">
-<a href="#simple-means-1" class="anchor" aria-hidden="true"></a>Simple means</h3>
+<div class="section level2">
+<h2 id="for-comparison-batch-effect-adjustment-ignoring-confounding">For comparison: Batch effect adjustment ignoring confounding<a class="anchor" aria-label="anchor" href="#for-comparison-batch-effect-adjustment-ignoring-confounding"></a>
+</h2>
+<div class="section level3">
+<h3 id="simple-means-1">Simple means<a class="anchor" aria-label="anchor" href="#simple-means-1"></a>
+</h3>
 <p><code>method = simple</code> leads to all batches having the same mean after adjustment. In the example, this method ignores that batch B should have higher values because of higher values of the <code>confounder</code>.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -286,9 +286,9 @@
 <span class="co">#&gt;  This method does not support adjustment for confounders (confounder). They will be ignored.</span></code></pre></div>
 <p><img src="batchtma_files/figure-html/unnamed-chunk-18-1.png" width="700"></p>
 </div>
-<div id="quantile-regression-2" class="section level3">
-<h3 class="hasAnchor">
-<a href="#quantile-regression-2" class="anchor" aria-hidden="true"></a>Quantile regression</h3>
+<div class="section level3">
+<h3 id="quantile-regression-2">Quantile regression<a class="anchor" aria-label="anchor" href="#quantile-regression-2"></a>
+</h3>
 <p><code>method = quantreg</code> also ignores the confounder.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">df</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> 
@@ -301,19 +301,19 @@
 </div>
 </div>
 </div>
-<div id="additional-features" class="section level1">
-<h1 class="hasAnchor">
-<a href="#additional-features" class="anchor" aria-hidden="true"></a>Additional features</h1>
-<div id="missing-values" class="section level2">
-<h2 class="hasAnchor">
-<a href="#missing-values" class="anchor" aria-hidden="true"></a>Missing values</h2>
+<div class="section level1">
+<h1 id="additional-features">Additional features<a class="anchor" aria-label="anchor" href="#additional-features"></a>
+</h1>
+<div class="section level2">
+<h2 id="missing-values">Missing values<a class="anchor" aria-label="anchor" href="#missing-values"></a>
+</h2>
 <p>batchtma can handle missing biomarker values, which is a common phenomenon in tissue microarray studies. No coding changes are needed.</p>
 <p>This situation is different from gene expression studies, where measured genes are typically measured on all batches (<em>e.g.</em>, microarrays) and methods like ComBat can “borrow” information from the other markers (genes) measured on the same batch.</p>
 <p>In batchtma, adjustments are done separately for each marker, even if multiple biomarkers are batch-adjusted with one call of <code>adjust_batch(markers = c(biomarker_a, biomarker_b, biomarker_c), ...)</code> and different rows (e.g., tumors) have missing values for different columns (biomarkers). Thus, no values will be excluded because of missingness in another marker.</p>
 </div>
-<div id="model-diagnostics" class="section level2">
-<h2 class="hasAnchor">
-<a href="#model-diagnostics" class="anchor" aria-hidden="true"></a>Model diagnostics</h2>
+<div class="section level2">
+<h2 id="model-diagnostics">Model diagnostics<a class="anchor" aria-label="anchor" href="#model-diagnostics"></a>
+</h2>
 <p>When running <code><a href="../reference/adjust_batch.html">adjust_batch()</a></code>, the dataset is returned with the batch effect-adjusted variables added at the end. Yet what did <code><a href="../reference/adjust_batch.html">adjust_batch()</a></code> do and how well did the methods used for batch effect correction fit to the data that they were applied to? Adjustment for batch effects relies on regression models for methods <code>standardize</code>, <code>ipw</code>, and <code>quantreg</code>; in addition, <code>method = simple</code> estimates means per batch.</p>
 <p>The <code><a href="../reference/diagnose_models.html">diagnose_models()</a></code> function provides an overview of what <code><a href="../reference/adjust_batch.html">adjust_batch()</a></code> did, shows overview of the adjustment models, and provides access to detailed model diagnostics.</p>
 <p>To obtain an overview of model diagnostics, <code><a href="../reference/diagnose_models.html">diagnose_models()</a></code> is called on the return values of <code><a href="../reference/adjust_batch.html">adjust_batch()</a></code>:</p>
@@ -330,13 +330,13 @@
 <span class="co">#&gt; Confounders: confounder</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Estimated adjustment parameters:</span>
-<span class="co">#&gt; # A tibble: 4 × 3</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 3</span></span>
 <span class="co">#&gt;   marker           .batchvar batchmean</span>
-<span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;         &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 noisy_conf_batch batchA      -12.4  </span>
-<span class="co">#&gt; 2 noisy_conf_batch batchB       20.6  </span>
-<span class="co">#&gt; 3 noisy_conf_batch batchC       -7.51 </span>
-<span class="co">#&gt; 4 noisy_conf_batch batchD       -0.683</span>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> noisy_conf_batch batchA      -<span style="color: #BB0000;">12.4</span>  </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> noisy_conf_batch batchB       20.6  </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> noisy_conf_batch batchC       -<span style="color: #BB0000;">7.51</span> </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> noisy_conf_batch batchD       -<span style="color: #BB0000;">0.683</span></span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Models for adjustment:</span>
 <span class="co">#&gt; [[1]]</span>
@@ -380,13 +380,13 @@
 <p>The marginally standardized means per batch are the adjustment parameters estimated by this procedure. They are returned by <code><a href="../reference/diagnose_models.html">diagnose_models()</a></code> as <code>adjust_parameters</code>:</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/diagnose_models.html">diagnose_models</a></span><span class="op">(</span><span class="va">df2</span><span class="op">)</span><span class="op">$</span><span class="va">adjust_parameters</span>
-<span class="co">#&gt; # A tibble: 4 × 3</span>
+<span class="co">#&gt; <span style="color: #949494;"># A tibble: 4 × 3</span></span>
 <span class="co">#&gt;   marker           .batchvar batchmean</span>
-<span class="co">#&gt;   &lt;chr&gt;            &lt;chr&gt;         &lt;dbl&gt;</span>
-<span class="co">#&gt; 1 noisy_conf_batch batchA      -12.4  </span>
-<span class="co">#&gt; 2 noisy_conf_batch batchB       20.6  </span>
-<span class="co">#&gt; 3 noisy_conf_batch batchC       -7.51 </span>
-<span class="co">#&gt; 4 noisy_conf_batch batchD       -0.683</span></code></pre></div>
+<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> noisy_conf_batch batchA      -<span style="color: #BB0000;">12.4</span>  </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> noisy_conf_batch batchB       20.6  </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> noisy_conf_batch batchC       -<span style="color: #BB0000;">7.51</span> </span>
+<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> noisy_conf_batch batchD       -<span style="color: #BB0000;">0.683</span></span></code></pre></div>
 <p>Diagnostics for regression models can be performed on fitted models just as for any other regression model in R. For example, residuals <em>vs.</em> fitted can be plotted:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>fitted    <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/fitted.values.html" class="external-link">fitted.values</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span>,
@@ -416,7 +416,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.9000.</p>
 </div>
 
       </footer>
