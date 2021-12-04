@@ -16,7 +16,7 @@
 #'
 #' @docType package
 #' @name batchtma
-#' @seealso \url{https://stopsack.github.io/batchtma}
+#' @seealso \url{https://stopsack.github.io/batchtma/}
 #' @references
 #' Stopsack KH, Tyekucheva S, Wang M, Gerke TA, Vaselkiv JB, Penney KL,
 #' Kantoff PW, Finn SP, Fiorentino M, Loda M, Lotan TL, Parmigiani G+,

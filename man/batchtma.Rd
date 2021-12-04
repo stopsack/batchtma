@@ -29,5 +29,5 @@ batch effects in tumor biomarker studies using tissue microarrays.
 bioRxiv 2021.06.29.450369; doi: https://doi.org/10.1101/2021.06.29.450369
 }
 \seealso{
-\url{https://stopsack.github.io/batchtma}
+\url{https://stopsack.github.io/batchtma/}
 }

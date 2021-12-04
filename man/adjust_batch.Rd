@@ -187,8 +187,8 @@ oligonucleotide array data based on variance and bias.
 Bioinformatics 2003;19:185–193. (\code{method = quantnorm})
 }
 \seealso{
-\url{https://stopsack.github.io/batchtma}
+\url{https://stopsack.github.io/batchtma/}
 }
 \author{
-Konrad H. Stopsack \url{stopsack@mskcc.org}
+Konrad H. Stopsack
 }

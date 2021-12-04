@@ -543,8 +543,8 @@ batch_quantnorm <- function(var, batch) {
 #' oligonucleotide array data based on variance and bias.
 #' Bioinformatics 2003;19:185–193. (\code{method = quantnorm})
 #'
-#' @author Konrad H. Stopsack \url{stopsack@mskcc.org}
-#' @seealso \url{https://stopsack.github.io/batchtma}
+#' @author Konrad H. Stopsack
+#' @seealso \url{https://stopsack.github.io/batchtma/}
 #'
 #' @examples
 #' # Data frame with two batches
