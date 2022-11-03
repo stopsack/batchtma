@@ -35,13 +35,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up R
-        uses: r-lib/actions/setup-r@master
+        uses: r-lib/actions/setup-r@HEAD
         if: matrix.config.image == null
         with:
           r-version: ${{ matrix.config.r }}
 
       - name: Set up pandoc
-        uses: r-lib/actions/setup-pandoc@master
+        uses: r-lib/actions/setup-pandoc@HEAD
         if: matrix.config.image == null
 
       - name: Install remotes
@@ -111,7 +111,7 @@ jobs:
 
       - name: Upload check results
         if: failure()
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@HEAD
         with:
           name: ${{ runner.os }}-r${{ matrix.config.r }}-bioc-${{ matrix.config.bioc }}-results
           path: check
@@ -124,7 +124,7 @@ jobs:
         shell: Rscript {0}
 
       - name: Deploy
-        if: github.event_name == 'push' && github.ref == 'refs/heads/master' && matrix.config.os == 'macOS-latest'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/HEAD' && matrix.config.os == 'macOS-latest'
         run: |
           R CMD INSTALL .
           Rscript -e "remotes::install_dev('pkgdown'); pkgdown::deploy_to_branch(new_process = FALSE)"
