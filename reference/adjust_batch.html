@@ -20,7 +20,7 @@ error between levels of batch."><!-- mathjax --><script src="https://cdnjs.cloud
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">batchtma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.7</span>
       </span>
     </div>
 
@@ -62,29 +62,35 @@ error between levels of <code>batch</code>.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">adjust_batch</span><span class="op">(</span>
-  <span class="va">data</span>,
-  <span class="va">markers</span>,
-  <span class="va">batch</span>,
-  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"simple"</span>, <span class="st">"standardize"</span>, <span class="st">"ipw"</span>, <span class="st">"quantreg"</span>, <span class="st">"quantnorm"</span><span class="op">)</span>,
-  confounders <span class="op">=</span> <span class="cn">NULL</span>,
-  suffix <span class="op">=</span> <span class="st">"_adjX"</span>,
-  ipw_truncate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span>,
-  quantreg_tau <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.75</span><span class="op">)</span>,
-  quantreg_method <span class="op">=</span> <span class="st">"fn"</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">adjust_batch</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  <span class="va">markers</span>,</span>
+<span>  <span class="va">batch</span>,</span>
+<span>  method <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"simple"</span>, <span class="st">"standardize"</span>, <span class="st">"ipw"</span>, <span class="st">"quantreg"</span>, <span class="st">"quantnorm"</span><span class="op">)</span>,</span>
+<span>  confounders <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  suffix <span class="op">=</span> <span class="st">"_adjX"</span>,</span>
+<span>  ipw_truncate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.025</span>, <span class="fl">0.975</span><span class="op">)</span>,</span>
+<span>  quantreg_tau <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.25</span>, <span class="fl">0.75</span><span class="op">)</span>,</span>
+<span>  quantreg_method <span class="op">=</span> <span class="st">"fn"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>data</dt>
 <dd><p>Data set</p></dd>
+
+
 <dt>markers</dt>
 <dd><p>Variable name(s) to batch-adjust. Select
 multiple variables with tidy evaluation, e.g.,
 <code>markers = starts_with("biomarker")</code>.</p></dd>
+
+
 <dt>batch</dt>
 <dd><p>Categorical variable indicating batch.</p></dd>
+
+
 <dt>method</dt>
 <dd><p>Method for batch effect correction:</p><ul><li><p><code>simple</code>  Simple means per batch will be subtracted.
 No adjustment for confounders.</p></li>
@@ -107,6 +113,8 @@ quantiles using the <code>quantreg_tau</code> parameters.</p></li>
 <li><p><code>quantnorm</code>  Quantile normalization between batches. No
 adjustment for confounders.</p></li>
 </ul></dd>
+
+
 <dt>confounders</dt>
 <dd><p>Optional: Confounders, i.e. determinants of
 biomarker levels that differ between batches. Only used if
@@ -115,6 +123,8 @@ biomarker levels that differ between batches. Only used if
 some of these "true" between-batch differences. Select multiple
 confounders with tidy evaluation, e.g.,
 <code>confounders = c(age, age_squared, sex)</code>.</p></dd>
+
+
 <dt>suffix</dt>
 <dd><p>Optional: What string to append to variable names
 after batch adjustment. Defaults to <code>"_adjX"</code>, with
@@ -124,21 +134,30 @@ after batch adjustment. Defaults to <code>"_adjX"</code>, with
 <li><p><code>_adj5</code> from <code>method = quantreg</code></p></li>
 <li><p><code>_adj6</code> from <code>method = quantnorm</code></p></li>
 </ul></dd>
+
+
 <dt>ipw_truncate</dt>
 <dd><p>Optional and used for <code>method = ipw</code> only:
 Lower and upper quantiles for truncation of stabilized
 weights. Defaults to <code>c(0.025, 0.975)</code>.</p></dd>
+
+
 <dt>quantreg_tau</dt>
 <dd><p>Optional and used for <code>method = quantreg</code> only:
 Quantiles to scale. Defaults to <code>c(0.25, 0.75)</code>.</p></dd>
+
+
 <dt>quantreg_method</dt>
 <dd><p>Optional and used for <code>method = quantreg</code> only:
 Algorithmic method to fit quantile regression. Defaults to
 <code>"fn"</code>. See parameter <code>method</code> of <code><a href="https://rdrr.io/pkg/quantreg/man/rq.html" class="external-link">rq</a></code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>The <code>data</code> dataset with batch effect-adjusted
+    
+
+<p>The <code>data</code> dataset with batch effect-adjusted
 variable(s) added at the end. Model diagnostics, using
 the attribute <code>.batchtma</code> of this dataset, are available
 via the <code><a href="diagnose_models.html">diagnose_models</a></code> function.</p>
@@ -189,7 +208,7 @@ other observations in a batch with non-missing confounders.</p>
 Kantoff PW, Finn SP, Fiorentino M, Loda M, Lotan TL, Parmigiani G+,
 Mucci LA+ (+ equal contribution). Extent, impact, and mitigation of
 batch effects in tumor biomarker studies using tissue microarrays.
-bioRxiv 2021.06.29.450369; doi: https://doi.org/10.1101/2021.06.29.450369
+eLife 2021;10:e71265. doi: https://doi.org/10.7554/elife.71265
 (This R package, all methods descriptions, and further recommendations.)</p>
 <p>Rosner B, Cook N, Portman R, Daniels S, Falkner B.
 Determination of blood pressure percentiles in
@@ -212,79 +231,84 @@ Bioinformatics 2003;19:185–193. (<code>method = quantnorm</code>)</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># Data frame with two batches</span></span>
-<span class="r-in"><span class="co"># Batch 2 has higher values of biomarker and confounder</span></span>
-<span class="r-in"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span class="r-in">  tma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, times <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
-<span class="r-in">  biomarker <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, times <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>max <span class="op">=</span> <span class="fl">5</span>, n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>,</span>
-<span class="r-in">  confounder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, times <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>max <span class="op">=</span> <span class="fl">10</span>, n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Adjust for batch effects</span></span>
-<span class="r-in"><span class="co"># Using simple means, ignoring the confounder:</span></span>
-<span class="r-in"><span class="fu">adjust_batch</span><span class="op">(</span></span>
-<span class="r-in">  data <span class="op">=</span> <span class="va">df</span>,</span>
-<span class="r-in">  markers <span class="op">=</span> <span class="va">biomarker</span>,</span>
-<span class="r-in">  batch <span class="op">=</span> <span class="va">tma</span>,</span>
-<span class="r-in">  method <span class="op">=</span> <span class="va">simple</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    tma biomarker confounder biomarker_adj2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    1  4.728426  3.6408742       5.473297</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2    2  6.388640  5.6744203       5.643768</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    1  4.262033  3.6834522       5.006905</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4    2  3.704271  4.6582394       2.959400</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5    1  2.518083  5.4208865       3.262954</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6    2  6.030028  5.7390137       5.285157</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7    1  4.438382  9.8292613       5.183253</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8    2  4.033990  4.4509641       3.289118</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9    1  3.267512  9.8184526       4.012383</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10   2  4.800284  4.4226534       4.055413</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11   1  3.470637  1.0283353       4.215509</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12   2  6.202918  6.4012785       5.458046</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13   1  2.514685  0.2071031       3.259557</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14   2  5.777517  7.8761378       5.032645</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15   1  5.113945  2.2828211       5.858817</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16   2  6.775838  3.5582327       6.030967</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17   1  2.818526  9.6474949       3.563397</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18   2  5.148582  9.7386757       4.403710</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19   1  2.845479  5.3362377       3.590351</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20   2  2.013068  3.1714874       1.268197</span>
-<span class="r-in"><span class="co"># Returns data set with new variable "biomarker_adj2"</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Use quantile regression, include the confounder,</span></span>
-<span class="r-in"><span class="co"># change suffix of returned variable:</span></span>
-<span class="r-in"><span class="fu">adjust_batch</span><span class="op">(</span></span>
-<span class="r-in">  data <span class="op">=</span> <span class="va">df</span>,</span>
-<span class="r-in">  markers <span class="op">=</span> <span class="va">biomarker</span>,</span>
-<span class="r-in">  batch <span class="op">=</span> <span class="va">tma</span>,</span>
-<span class="r-in">  method <span class="op">=</span> <span class="va">quantreg</span>,</span>
-<span class="r-in">  confounders <span class="op">=</span> <span class="va">confounder</span>,</span>
-<span class="r-in">  suffix <span class="op">=</span> <span class="st">"_batchadjusted"</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    tma biomarker confounder biomarker_batchadjusted</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    1  4.728426  3.6408742                5.295228</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2    2  6.388640  5.6744203                5.029466</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    1  4.262033  3.6834522                4.794744</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4    2  3.704271  4.6582394                2.961586</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5    1  2.518083  5.4208865                2.923318</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6    2  6.030028  5.7390137                4.753213</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 7    1  4.438382  9.8292613                4.983983</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 8    2  4.033990  4.4509641                3.215581</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 9    1  3.267512  9.8184526                3.727527</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 10   2  4.800284  4.4226534                3.805890</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 11   1  3.470637  1.0283353                3.945500</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 12   2  6.202918  6.4012785                4.886397</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 13   1  2.514685  0.2071031                2.919672</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 14   2  5.777517  7.8761378                4.558693</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 15   1  5.113945  2.2828211                5.708928</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 16   2  6.775838  3.5582327                5.327742</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 17   1  2.818526  9.6474949                3.245722</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 18   2  5.148582  9.7386757                4.074198</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 19   1  2.845479  5.3362377                3.274646</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 20   2  2.013068  3.1714874                1.658781</span>
-<span class="r-in"><span class="co"># Returns data set with new variable "biomarker_batchadjusted"</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Data frame with two batches</span></span></span>
+<span class="r-in"><span><span class="co"># Batch 2 has higher values of biomarker and confounder</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  tma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, times <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  biomarker <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, times <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>max <span class="op">=</span> <span class="fl">5</span>, n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  confounder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, times <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>max <span class="op">=</span> <span class="fl">10</span>, n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Adjust for batch effects</span></span></span>
+<span class="r-in"><span><span class="co"># Using simple means, ignoring the confounder:</span></span></span>
+<span class="r-in"><span><span class="fu">adjust_batch</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">df</span>,</span></span>
+<span class="r-in"><span>  markers <span class="op">=</span> <span class="va">biomarker</span>,</span></span>
+<span class="r-in"><span>  batch <span class="op">=</span> <span class="va">tma</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="va">simple</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    tma biomarker  confounder biomarker_adj2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    1  5.826365  9.63869860       5.799964</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    2  6.286064  5.88856775       6.312465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    1  1.871142  2.89600079       1.844742</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    2  6.012551  6.24629664       6.038952</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    1  5.114616  4.49060902       5.088215</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    2  3.030171  2.83524986       3.056572</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7    1  5.999559  3.41168405       5.973158</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8    2  2.272753  1.39925209       2.299154</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9    1  3.780991  7.42553461       3.754590</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   2  2.262824 10.17478778       2.289225</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11   1  4.543842  4.36862373       4.517441</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12   2  5.140426  8.01507055       5.166827</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13   1  1.761938  0.02729643       1.735537</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14   2  6.292404  9.29900861       6.318805</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15   1  5.791768  5.06861506       5.765367</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16   2  3.332754  6.78014967       3.359155</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17   1  1.692169  1.43623105       1.665768</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18   2  3.310251  6.33401210       3.336652</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19   1  5.357557  5.43502803       5.331156</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20   2  3.271732  3.22722708       3.298133</span>
+<span class="r-in"><span><span class="co"># Returns data set with new variable "biomarker_adj2"</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Use quantile regression, include the confounder,</span></span></span>
+<span class="r-in"><span><span class="co"># change suffix of returned variable:</span></span></span>
+<span class="r-in"><span><span class="fu">adjust_batch</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">df</span>,</span></span>
+<span class="r-in"><span>  markers <span class="op">=</span> <span class="va">biomarker</span>,</span></span>
+<span class="r-in"><span>  batch <span class="op">=</span> <span class="va">tma</span>,</span></span>
+<span class="r-in"><span>  method <span class="op">=</span> <span class="va">quantreg</span>,</span></span>
+<span class="r-in"><span>  confounders <span class="op">=</span> <span class="va">confounder</span>,</span></span>
+<span class="r-in"><span>  suffix <span class="op">=</span> <span class="st">"_batchadjusted"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>Returning data frames from `filter()` expressions was deprecated in dplyr</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> 1.0.8.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use `if_any()` or `if_all()` instead.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">dplyr</span> package.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   Please report the issue at <span style="color: #0000BB; font-style: italic;">&lt;https://github.com/tidyverse/dplyr/issues&gt;</span>.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    tma biomarker  confounder biomarker_batchadjusted</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    1  5.826365  9.63869860                5.244982</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    2  6.286064  5.88856775                7.027083</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    1  1.871142  2.89600079                2.099327</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    2  6.012551  6.24629664                6.725009</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    1  5.114616  4.49060902                4.678917</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    2  3.030171  2.83524986                3.431209</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7    1  5.999559  3.41168405                5.382726</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8    2  2.272753  1.39925209                2.594701</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9    1  3.780991  7.42553461                3.618262</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   2  2.262824 10.17478778                2.583735</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11   1  4.543842  4.36862373                4.224970</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12   2  5.140426  8.01507055                5.761817</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13   1  1.761938  0.02729643                2.012475</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14   2  6.292404  9.29900861                7.034085</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15   1  5.791768  5.06861506                5.217467</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16   2  3.332754  6.78014967                3.765387</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17   1  1.692169  1.43623105                1.956987</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18   2  3.310251  6.33401210                3.740534</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19   1  5.357557  5.43502803                4.872132</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20   2  3.271732  3.22722708                3.697993</span>
+<span class="r-in"><span><span class="co"># Returns data set with new variable "biomarker_batchadjusted"</span></span></span>
 </code></pre></div>
     </div>
   </div>
@@ -299,7 +323,7 @@ Bioinformatics 2003;19:185–193. (<code>method = quantnorm</code>)</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>

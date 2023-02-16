@@ -23,7 +23,7 @@ interquartile range; and asterisks indicate means."><!-- mathjax --><script src=
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">batchtma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.6</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.7</span>
       </span>
     </div>
 
@@ -68,43 +68,58 @@ interquartile range; and asterisks indicate means.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">plot_batch</span><span class="op">(</span>
-  <span class="va">data</span>,
-  <span class="va">marker</span>,
-  <span class="va">batch</span>,
-  color <span class="op">=</span> <span class="cn">NULL</span>,
-  maxlevels <span class="op">=</span> <span class="fl">15</span>,
-  title <span class="op">=</span> <span class="cn">NULL</span>,
-  <span class="va">...</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_batch</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  <span class="va">marker</span>,</span>
+<span>  <span class="va">batch</span>,</span>
+<span>  color <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  maxlevels <span class="op">=</span> <span class="fl">15</span>,</span>
+<span>  title <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>data</dt>
 <dd><p>Dataset.</p></dd>
+
+
 <dt>marker</dt>
 <dd><p>Variable indicating the biomarker.</p></dd>
+
+
 <dt>batch</dt>
 <dd><p>Variable indicating the batch.</p></dd>
+
+
 <dt>color</dt>
 <dd><p>Optional: third variable to use for symbol
 color and shape. For example, <code>color</code> can be used
 to show differences in a confounder.</p></dd>
+
+
 <dt>maxlevels</dt>
 <dd><p>Optional: Maximum number of
 levels for <code>color</code> parameter to accept as a discrete
 variable, rather than a continuous variable.
 Defaults to <code>15</code>.</p></dd>
+
+
 <dt>title</dt>
 <dd><p>Optional: character string that specifies plot
 title</p></dd>
+
+
 <dt>...</dt>
 <dd><p>Optional: Passed on to <code><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></code>.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>ggplot2 object, which can be further
+    
+
+<p>ggplot2 object, which can be further
 modified using standard ggplot2 functions. See examples.</p>
     </div>
     <div id="references">
@@ -128,32 +143,32 @@ in the BatchQC package:</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span class="co"># Define example data</span></span>
-<span class="r-in"><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span class="r-in">  tma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, times <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span>
-<span class="r-in">  biomarker <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, times <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>max <span class="op">=</span> <span class="fl">5</span>, n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>,</span>
-<span class="r-in">  confounder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, times <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">    <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>max <span class="op">=</span> <span class="fl">10</span>, n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span>
-<span class="r-in"><span class="op">)</span></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Visualize batch effects:</span></span>
-<span class="r-in"><span class="fu">plot_batch</span><span class="op">(</span></span>
-<span class="r-in">  data <span class="op">=</span> <span class="va">df</span>,</span>
-<span class="r-in">  marker <span class="op">=</span> <span class="va">biomarker</span>,</span>
-<span class="r-in">  batch <span class="op">=</span> <span class="va">tma</span>,</span>
-<span class="r-in">  color <span class="op">=</span> <span class="va">confounder</span></span>
-<span class="r-in"><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Define example data</span></span></span>
+<span class="r-in"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>  tma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, times <span class="op">=</span> <span class="fl">10</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  biomarker <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, times <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>max <span class="op">=</span> <span class="fl">5</span>, n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>  confounder <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span><span class="op">:</span><span class="fl">1</span>, times <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>max <span class="op">=</span> <span class="fl">10</span>, n <span class="op">=</span> <span class="fl">20</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Visualize batch effects:</span></span></span>
+<span class="r-in"><span><span class="fu">plot_batch</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">df</span>,</span></span>
+<span class="r-in"><span>  marker <span class="op">=</span> <span class="va">biomarker</span>,</span></span>
+<span class="r-in"><span>  batch <span class="op">=</span> <span class="va">tma</span>,</span></span>
+<span class="r-in"><span>  color <span class="op">=</span> <span class="va">confounder</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_batch-1.png" alt="" width="700" height="433"></span>
-<span class="r-in"></span>
-<span class="r-in"><span class="co"># Label y-axis, changing graph like other ggplots:</span></span>
-<span class="r-in"><span class="fu">plot_batch</span><span class="op">(</span></span>
-<span class="r-in">  data <span class="op">=</span> <span class="va">df</span>,</span>
-<span class="r-in">  marker <span class="op">=</span> <span class="va">biomarker</span>,</span>
-<span class="r-in">  batch <span class="op">=</span> <span class="va">tma</span>,</span>
-<span class="r-in">  color <span class="op">=</span> <span class="va">confounder</span></span>
-<span class="r-in"><span class="op">)</span> <span class="op">+</span></span>
-<span class="r-in">  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="st">"Biomarker (variable 'noisy')"</span><span class="op">)</span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># Label y-axis, changing graph like other ggplots:</span></span></span>
+<span class="r-in"><span><span class="fu">plot_batch</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  data <span class="op">=</span> <span class="va">df</span>,</span></span>
+<span class="r-in"><span>  marker <span class="op">=</span> <span class="va">biomarker</span>,</span></span>
+<span class="r-in"><span>  batch <span class="op">=</span> <span class="va">tma</span>,</span></span>
+<span class="r-in"><span>  color <span class="op">=</span> <span class="va">confounder</span></span></span>
+<span class="r-in"><span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>y <span class="op">=</span> <span class="st">"Biomarker (variable 'noisy')"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot_batch-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
@@ -169,7 +184,7 @@ in the BatchQC package:</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.1.9000.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
