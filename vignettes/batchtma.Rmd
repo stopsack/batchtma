@@ -32,11 +32,12 @@ remotes::install_github("stopsack/batchtma", build_vignettes = TRUE)
 
 # Set up and plot example data
 
-We load the batchtma package and, for convenience with data handling and plotting, the tidyverse package:
+We load the batchtma package and, for convenience with data handling and plotting, components of the tidyverse package:
 
 ```{r, message = FALSE}
 library(batchtma)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
 ```
 
 We construct a toy dataset of 10 individuals (*e.g.,* tumors), each with 40 measurements (*e.g.,* cores on tissue microarrays) per batch. Unlike perhaps in the real world, for each individual tumor, we also have measurements on all the other batches.

@@ -529,7 +529,7 @@ batch_quantnorm <- function(var, batch) {
 #' Kantoff PW, Finn SP, Fiorentino M, Loda M, Lotan TL, Parmigiani G+,
 #' Mucci LA+ (+ equal contribution). Extent, impact, and mitigation of
 #' batch effects in tumor biomarker studies using tissue microarrays.
-#' bioRxiv 2021.06.29.450369; doi: https://doi.org/10.1101/2021.06.29.450369
+#' eLife 2021;10:e71265. doi: https://doi.org/10.7554/elife.71265
 #' (This R package, all methods descriptions, and further recommendations.)
 #'
 #' Rosner B, Cook N, Portman R, Daniels S, Falkner B.

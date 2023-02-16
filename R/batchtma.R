@@ -22,6 +22,6 @@
 #' Kantoff PW, Finn SP, Fiorentino M, Loda M, Lotan TL, Parmigiani G+,
 #' Mucci LA+ (+ equal contribution). Extent, impact, and mitigation of
 #' batch effects in tumor biomarker studies using tissue microarrays.
-#' bioRxiv 2021.06.29.450369; doi: https://doi.org/10.1101/2021.06.29.450369
+#' eLife 2021;10:e71265. doi: https://doi.org/10.7554/elife.71265
 NULL
 # > NULL
