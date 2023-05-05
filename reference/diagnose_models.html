@@ -147,8 +147,8 @@ variable and <code>.batchvar</code> and <code>confounders</code> as predictors.<
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 2 × 10</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   .batchvar un_lo ad_lo un_hi ad_hi all_lo all_iq un_iq ad_iq marker   </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 1          1.84  1.52  5.42  5.24   2.51   2.91  3.57  3.72 biomarker</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 2          2.70  2.03  5.43  5.34   2.51   2.91  2.73  3.31 biomarker</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 1          3.08  3.00  5.47  5.67   3.05   2.29  2.39  2.67 biomarker</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 2          2.96  2.82  5.25  5.15   3.05   2.29  2.29  2.33 biomarker</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Models for adjustment:</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [[1]]</span>
@@ -159,10 +159,10 @@ variable and <code>.batchvar</code> and <code>confounders</code> as predictors.<
 <span class="r-out co"><span class="r-pr">#&gt;</span>     method = rq_method)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Coefficients:</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             tau= 0.25 tau= 0.75</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept) 0.8809195 4.2409377</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> .batchvar2  0.5068006 0.1031828</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> confounder  0.1797128 0.1270984</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>               tau= 0.25   tau= 0.75</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (Intercept)  3.20982637  5.34848389</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> .batchvar2  -0.18124790 -0.51964617</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> confounder  -0.02695189  0.04161139</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Degrees of freedom: 20 total; 17 residual</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -174,26 +174,26 @@ variable and <code>.batchvar</code> and <code>confounders</code> as predictors.<
 <span class="r-in"><span><span class="co"># Obtain residuals for this model:</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/stats/residuals.html" class="external-link">residuals</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>           tau= 0.25     tau= 0.75</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]  1.907442e+00 -1.157038e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  2.506689e+00 -9.121948e-11</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,]  2.722797e+00 -5.852928e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,] -2.550848e-12 -2.690865e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,] -6.408207e-13 -3.078000e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  2.967590e+00  3.571090e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  9.255475e-02 -2.972013e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  2.788532e+00 -4.988454e-11</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  3.933456e+00  7.650132e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  4.583881e-01 -1.994484e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [11,]  2.244841e+00 -6.136689e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [12,]  9.940313e-01 -1.868840e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [13,] -2.546188e-01 -3.441227e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [14,]  1.239079e+00 -1.464183e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [15,] -4.084392e-01 -3.517763e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [16,] -1.025302e-01 -2.584304e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [17,]  2.873869e+00  2.547811e-10</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [18,]  2.804424e+00  2.485582e-01</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [19,]  4.389230e+00  1.144870e+00</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [20,]  5.905498e-12 -2.606501e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1,]  2.757340e+00  1.408076e-06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [2,]  3.805091e-01 -2.118751e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3,] -1.731560e+00 -4.375156e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [4,]  1.386065e+00 -8.800209e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5,]  2.486443e+00  1.426650e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [6,]  3.003700e+00  6.904545e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7,]  2.148553e+00 -1.305571e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [8,]  4.043362e+00  2.048415e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9,]  1.220086e+00 -1.539395e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [10,]  1.394797e+00 -8.594793e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [11,]  1.143558e+00 -1.383157e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [12,]  2.499910e+00  3.364544e-08</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13,]  8.310807e-01 -1.412020e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [14,]  6.577849e-12 -2.388171e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [15,] -1.241507e+00 -3.848048e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [16,] -5.343059e-11 -1.965498e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [17,]  4.934275e-12 -2.466637e+00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [18,]  1.716375e+00 -3.909663e-01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19,]  2.339158e+00  2.416545e-09</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [20,] -8.618042e-01 -2.831051e+00</span>
 </code></pre></div>
     </div>
   </div>
