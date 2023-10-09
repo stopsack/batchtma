@@ -124,19 +124,19 @@ jobs:
         shell: Rscript {0}
 
       - name: pkgdown dependencies
-        if: github.event_name != 'pull_request' && matrix.config.os == 'macOS-latest'
+        if: github.event_name == 'push' && matrix.config.os == 'macOS-latest'
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: any::pkgdown, local::.
           needs: website
 
       - name: Build site
-        if: github.event_name != 'pull_request' && matrix.config.os == 'macOS-latest'
+        if: github.event_name == 'push' && matrix.config.os == 'macOS-latest'
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
 
       - name: Deploy to GitHub pages 🚀
-        if: github.event_name != 'pull_request' && matrix.config.os == 'macOS-latest'
+        if: github.event_name == 'push' && matrix.config.os == 'macOS-latest'
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           clean: false
