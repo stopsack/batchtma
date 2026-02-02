@@ -17,30 +17,36 @@ batchrq <- function(data, variable, confounders, tau, rq_method) {
     dplyr::mutate(
       un = purrr::map(
         .x = .data$data,
-        .f = ~ quantreg::rq(
-          formula = variable ~ .batchvar,
-          data = .x,
-          tau = tau,
-          method = rq_method
-        )
+        .f = \(x) {
+          quantreg::rq(
+            formula = variable ~ .batchvar,
+            data = x,
+            tau = tau,
+            method = rq_method
+          )
+        }
       ),
       ad = purrr::map(
         .x = .data$data,
-        .f = ~ quantreg::rq(
-          formula = stats::reformulate(
-            response = "variable",
-            termlabels = c(".batchvar", confounders)
-          ),
-          data = .x,
-          tau = tau,
-          method = rq_method
-        )
+        .f = \(x) {
+          quantreg::rq(
+            formula = stats::reformulate(
+              response = "variable",
+              termlabels = c(".batchvar", confounders)
+            ),
+            data = x,
+            tau = tau,
+            method = rq_method
+          )
+        }
       ),
       .batchvar = purrr::map(
         .x = .data$data,
-        .f = ~ .x |>
-          dplyr::pull(.data$.batchvar) |>
-          levels()
+        .f = \(x) {
+          x |>
+            dplyr::pull(.data$.batchvar) |>
+            levels()
+        }
       )
     )
 
@@ -50,27 +56,46 @@ batchrq <- function(data, variable, confounders, tau, rq_method) {
       data = purrr::map2(
         .x = .data$data,
         .y = .data$.batchvar,
-        .f = ~ .x |> dplyr::mutate(.batchvar = .y)
+        .f = \(x, y) {
+          x |>
+            dplyr::mutate(.batchvar = y)
+        }
       ),
-      un = purrr::map2(.x = .data$un, .y = .data$data, .f = stats::predict),
-      ad = purrr::map2(.x = .data$ad, .y = .data$data, .f = stats::predict),
+      un = purrr::map2(
+        .x = .data$un,
+        .y = .data$data,
+        .f = stats::predict
+      ),
+      ad = purrr::map2(
+        .x = .data$ad,
+        .y = .data$data,
+        .f = stats::predict
+      ),
       un = purrr::map(
         .x = .data$un,
-        .f = tibble::as_tibble,
-        .name_repair = ~ c("un_lo", "un_hi")
+        .f = \(x) {
+          tibble::as_tibble(
+            x,
+            .name_repair = ~ c("un_lo", "un_hi")
+          )
+        }
       ),
       ad = purrr::map(
         .x = .data$ad,
-        .f = tibble::as_tibble,
-        .name_repair = ~ c("ad_lo", "ad_hi")
+        .f = \(x) {
+          tibble::as_tibble(
+            x,
+            .name_repair = ~ c("ad_lo", "ad_hi")
+          )
+        }
       ),
       all_lo = purrr::map_dbl(
         .x = .data$data,
-        .f = ~ stats::quantile(.x$variable, probs = 0.25)
+        .f = \(x) stats::quantile(x$variable, probs = 0.25)
       ),
       all_hi = purrr::map_dbl(
         .x = .data$data,
-        .f = ~ stats::quantile(.x$variable, probs = 0.75)
+        .f = \(x) stats::quantile(x$variable, probs = 0.75)
       ),
       all_iq = .data$all_hi - .data$all_lo
     ) |>

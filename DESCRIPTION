@@ -25,7 +25,7 @@ Depends:
     R (>= 4.1.0)
 Imports:
     broom (>= 0.7.0),
-    dplyr (>= 1.0.0),
+    dplyr (>= 1.0.4),
     geepack,
     ggplot2,
     limma,

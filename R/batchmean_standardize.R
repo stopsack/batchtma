@@ -20,28 +20,34 @@ batchmean_standardize <- function(data, markers, confounders) {
     dplyr::mutate(
       data = purrr::map(
         .x = .data$data,
-        .f = ~ .x |>
-          dplyr::mutate(.batchvar = factor_drop(.data$.batchvar))
+        .f = \(x) {
+          x |>
+            dplyr::mutate(.batchvar = factor_drop(.data$.batchvar))
+        }
       ),
       model = purrr::map(
         .x = .data$data,
-        .f = ~ stats::lm(
-          formula = stats::as.formula(paste0(
-            "value ~ .batchvar +",
-            paste(
-              confounders,
-              collapse = " + ",
-              sep = " + "
-            )
-          )),
-          data = .x
-        )
+        .f = \(x) {
+          stats::lm(
+            formula = stats::as.formula(paste0(
+              "value ~ .batchvar +",
+              paste(
+                confounders,
+                collapse = " + ",
+                sep = " + "
+              )
+            )),
+            data = x
+          )
+        }
       ),
       .batchvar = purrr::map(
         .x = .data$data,
-        .f = ~ .x |>
-          dplyr::pull(.data$.batchvar) |>
-          levels()
+        .f = \(x) {
+          x |>
+            dplyr::pull(.data$.batchvar) |>
+            levels()
+        }
       )
     )
 
@@ -51,9 +57,16 @@ batchmean_standardize <- function(data, markers, confounders) {
       data = purrr::map2(
         .x = .data$data,
         .y = .data$.batchvar,
-        .f = ~ .x |> dplyr::mutate(.batchvar = .y)
+        .f = \(x, y) {
+          x |>
+            dplyr::mutate(.batchvar = y)
+        }
       ),
-      pred = purrr::map2(.x = .data$model, .y = .data$data, .f = stats::predict)
+      pred = purrr::map2(
+        .x = .data$model,
+        .y = .data$data,
+        .f = stats::predict
+      )
     ) |>
     dplyr::select(.data$marker, .data$.batchvar, .data$pred) |>
     tidyr::unnest(cols = .data$pred) |>

@@ -265,7 +265,7 @@ adjust_batch <- function(
     )
     adjust_parameters <- purrr::map_dfr(
       .x = res,
-      .f = ~ purrr::pluck(.x, "values")
+      .f = \(x) purrr::pluck(x, "values")
     )
     method_indices <- c("simple" = 2, "standardize" = 3, "ipw" = 4)
     if (suffix == "_adjX") {
@@ -293,10 +293,12 @@ adjust_batch <- function(
       .x = data |> dplyr::select({{ markers }}) |> names(),
       .f = batchrq,
       data = data |>
-        dplyr::filter(dplyr::across(
-          dplyr::all_of({{ confounders }}),
-          ~ !is.na(.x)
-        )),
+        dplyr::filter(
+          dplyr::if_all(
+            dplyr::all_of({{ confounders }}),
+            \(x) !is.na(x)
+          )
+        ),
       confounders = dplyr::if_else(
         dplyr::enexpr(confounders) != "",
         true = paste0(
@@ -314,7 +316,7 @@ adjust_batch <- function(
     )
     adjust_parameters <- purrr::map_dfr(
       .x = res,
-      .f = ~ purrr::pluck(.x, "values")
+      .f = \(x) purrr::pluck(x, "values")
     )
     if (suffix == "_adjX") {
       suffix <- "_adj5"
@@ -410,7 +412,7 @@ adjust_batch <- function(
     adjust_parameters = adjust_parameters,
     model_fits = purrr::map(
       .x = res,
-      .f = ~ purrr::pluck(.x, "models")
+      .f = \(x) purrr::pluck(x, "models")
     )
   )
   class(attr_list) <- c("batchtma", class(res))

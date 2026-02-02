@@ -25,38 +25,57 @@ batchmean_ipw <- function(
       dplyr::mutate(
         num = purrr::map(
           .x = .data$data,
-          .f = ~ nnet::multinom(
-            formula = .batchvar ~ 1,
-            data = .x,
-            trace = FALSE
-          )
+          .f = \(x) {
+            nnet::multinom(
+              formula = .batchvar ~ 1,
+              data = x,
+              trace = FALSE
+            )
+          }
         ),
         den = purrr::map(
           .x = .data$data,
-          .f = ~ nnet::multinom(
-            formula = stats::as.formula(
-              paste(".batchvar ~", confounders)
-            ),
-            data = .x,
-            trace = FALSE
-          )
+          .f = \(x) {
+            nnet::multinom(
+              formula = stats::as.formula(
+                paste(".batchvar ~", confounders)
+              ),
+              data = x,
+              trace = FALSE
+            )
+          }
         )
       )
 
     values <- res |>
       dplyr::mutate_at(
         .vars = dplyr::vars(.data$num, .data$den),
-        .funs = ~ purrr::map(.x = ., .f = stats::predict, type = "probs") |>
-          purrr::map(.x = ., .f = tibble::as_tibble) |>
-          purrr::map2(
-            .x = .,
-            .y = .data$data,
-            .f = ~ .x |>
-              dplyr::mutate(
-                .batchvar = .y |>
-                  purrr::pluck(".batchvar")
+        .funs = \(num_den) {
+          purrr::map(
+            .x = num_den,
+            .f = \(x) {
+              stats::predict(
+                x,
+                type = "probs"
               )
-          )
+            }
+          ) |>
+            purrr::map(
+              .x = _,
+              .f = tibble::as_tibble
+            ) |>
+            purrr::map2(
+              .x = _,
+              .y = .data$data,
+              .f = \(x, y) {
+                x |>
+                  dplyr::mutate(
+                    .batchvar = y |>
+                      purrr::pluck(".batchvar")
+                  )
+              }
+            )
+        }
       )
 
     # multinom()$fitted.values is just a vector of probabilities for
@@ -65,35 +84,43 @@ batchmean_ipw <- function(
       values <- values |>
         dplyr::mutate_at(
           .vars = dplyr::vars(.data$num, .data$den),
-          .funs = ~ purrr::map(
-            .x = .,
-            .f = ~ .x |>
-              dplyr::mutate(
-                probs = dplyr::if_else(
-                  .data$.batchvar == levels(factor(.data$.batchvar))[1],
-                  true = 1 - .data$value,
-                  false = .data$value
-                )
-              ) |>
-              dplyr::pull(.data$probs)
-          )
+          .funs = \(num_den) {
+            purrr::map(
+              .x = num_den,
+              .f = \(x) {
+                x |>
+                  dplyr::mutate(
+                    probs = dplyr::if_else(
+                      .data$.batchvar == levels(factor(.data$.batchvar))[1],
+                      true = 1 - .data$value,
+                      false = .data$value
+                    )
+                  ) |>
+                  dplyr::pull(.data$probs)
+              }
+            )
+          }
         )
       # otherwise probabilities are a data frame
     } else {
       values <- values |>
         dplyr::mutate_at(
           .vars = dplyr::vars(.data$num, .data$den),
-          .funs = ~ purrr::map(
-            .x = .,
-            .f = ~ .x |>
-              tidyr::pivot_longer(
-                -.data$.batchvar,
-                names_to = "batch",
-                values_to = "prob"
-              ) |>
-              dplyr::filter(.data$batch == .data$.batchvar) |>
-              dplyr::pull(.data$prob)
-          )
+          .funs = \(num_den) {
+            purrr::map(
+              .x = num_den,
+              .f = \(x) {
+                x |>
+                  tidyr::pivot_longer(
+                    -.data$.batchvar,
+                    names_to = "batch",
+                    values_to = "prob"
+                  ) |>
+                  dplyr::filter(.data$batch == .data$.batchvar) |>
+                  dplyr::pull(.data$prob)
+              }
+            )
+          }
         )
     }
 
@@ -161,7 +188,12 @@ batchmean_ipw <- function(
     .x = data |> dplyr::select({{ markers }}) |> names(),
     .f = ipwbatch,
     data = data |>
-      dplyr::filter(dplyr::across(dplyr::all_of(confounders), ~ !is.na(.x))),
+      dplyr::filter(
+        dplyr::if_all(
+          .cols = dplyr::all_of(confounders),
+          .fns = \(x) !is.na(x)
+        )
+      ),
     truncate = truncate,
     confounders = paste(confounders, sep = " + ", collapse = " + ")
   )

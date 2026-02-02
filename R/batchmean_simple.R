@@ -17,7 +17,7 @@ batchmean_simple <- function(data, markers) {
     ) |>
     dplyr::mutate_at(
       .vars = dplyr::vars(-.data$.batchvar),
-      .funs = ~ . - mean(., na.rm = TRUE)
+      .funs = \(x) x - mean(x, na.rm = TRUE)
     ) |>
     tidyr::pivot_longer(
       col = c(-.data$.batchvar),
