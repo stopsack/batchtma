@@ -37,6 +37,8 @@ Imports:
     magrittr
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat (>= 3.0.0)
 VignetteBuilder: knitr
 URL: https://stopsack.github.io/batchtma, https://github.com/stopsack/batchtma
+Config/testthat/edition: 3
