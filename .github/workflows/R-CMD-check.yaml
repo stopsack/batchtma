@@ -4,7 +4,7 @@ on:
     branches:
       - master
   schedule:
-    - cron: '0 8 * * 5'
+    - cron: '0 8 1 * *'
 
 name: R-CMD-check
 
@@ -21,7 +21,6 @@ jobs:
         config:
         - { os: windows-latest, r: 'release'}
         - { os: macOS-latest, r: 'release'}
-         #- { os: ubuntu-16.04, r: 'release', bioc: 'release', cran: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
         - { os: ubuntu-latest, r: 'release'}
 
     env:
