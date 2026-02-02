@@ -14,7 +14,7 @@
 #'
 #' \code{\link[batchtma]{plot_batch}}: Plot biomarkers by batch
 #'
-#' @docType package
+#' @docType _PACKAGE
 #' @name batchtma
 #' @seealso \url{https://stopsack.github.io/batchtma/}
 #' @references

@@ -9,11 +9,11 @@
 #' @return Tibble of quantiles per batch
 #' @noRd
 batchrq <- function(data, variable, confounders, tau, rq_method) {
-  res <- data %>%
-    dplyr::rename(variable = {{ variable }}) %>%
-    dplyr::filter(!is.na(.data$variable)) %>%
-    dplyr::mutate(.batchvar = factor_drop(.data$.batchvar)) %>%
-    tidyr::nest(data = dplyr::everything()) %>%
+  res <- data |>
+    dplyr::rename(variable = {{ variable }}) |>
+    dplyr::filter(!is.na(.data$variable)) |>
+    dplyr::mutate(.batchvar = factor_drop(.data$.batchvar)) |>
+    tidyr::nest(data = dplyr::everything()) |>
     dplyr::mutate(
       un = purrr::map(
         .x = .data$data,
@@ -38,19 +38,19 @@ batchrq <- function(data, variable, confounders, tau, rq_method) {
       ),
       .batchvar = purrr::map(
         .x = .data$data,
-        .f = ~ .x %>%
-          dplyr::pull(.data$.batchvar) %>%
+        .f = ~ .x |>
+          dplyr::pull(.data$.batchvar) |>
           levels()
       )
     )
 
-  values <- res %>%
-    tidyr::unnest(cols = .data$.batchvar) %>%
+  values <- res |>
+    tidyr::unnest(cols = .data$.batchvar) |>
     dplyr::mutate(
       data = purrr::map2(
         .x = .data$data,
         .y = .data$.batchvar,
-        .f = ~ .x %>% dplyr::mutate(.batchvar = .y)
+        .f = ~ .x |> dplyr::mutate(.batchvar = .y)
       ),
       un = purrr::map2(.x = .data$un, .y = .data$data, .f = stats::predict),
       ad = purrr::map2(.x = .data$ad, .y = .data$data, .f = stats::predict),
@@ -73,7 +73,7 @@ batchrq <- function(data, variable, confounders, tau, rq_method) {
         .f = ~ stats::quantile(.x$variable, probs = 0.75)
       ),
       all_iq = .data$all_hi - .data$all_lo
-    ) %>%
+    ) |>
     dplyr::select(
       .data$.batchvar,
       .data$un,
@@ -81,9 +81,9 @@ batchrq <- function(data, variable, confounders, tau, rq_method) {
       .data$all_lo,
       .data$all_hi,
       .data$all_iq
-    ) %>%
-    tidyr::unnest(cols = c(.data$un, .data$ad)) %>%
-    dplyr::group_by(.data$.batchvar) %>%
+    ) |>
+    tidyr::unnest(cols = c(.data$un, .data$ad)) |>
+    dplyr::group_by(.data$.batchvar) |>
     dplyr::summarize(
       un_lo = stats::quantile(.data$un_lo, probs = 0.25),
       ad_lo = stats::quantile(.data$ad_lo, probs = 0.25),
@@ -91,13 +91,13 @@ batchrq <- function(data, variable, confounders, tau, rq_method) {
       ad_hi = stats::quantile(.data$ad_hi, probs = 0.75),
       all_lo = stats::median(.data$all_lo),
       all_iq = stats::median(.data$all_iq)
-    ) %>%
+    ) |>
     dplyr::mutate(
       un_iq = .data$un_hi - .data$un_lo,
       ad_iq = .data$ad_hi - .data$ad_lo,
       marker = {{ variable }}
     )
 
-  models <- res %>% dplyr::pull(.data$ad)
+  models <- res |> dplyr::pull(.data$ad)
   return(tibble::lst(values, models))
 }

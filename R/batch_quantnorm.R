@@ -6,14 +6,14 @@
 #' @return Tibble of means per batch for one variable
 #' @noRd
 batch_quantnorm <- function(var, batch) {
-  tibble::tibble(var, batch) %>%
-    tibble::rowid_to_column() %>%
-    tidyr::pivot_wider(names_from = batch, values_from = var) %>%
-    dplyr::select(-.data$rowid) %>%
-    dplyr::select_if(~ !all(is.na(.))) %>%
-    as.matrix() %>%
-    limma::normalizeQuantiles() %>%
-    tibble::as_tibble() %>%
+  tibble::tibble(var, batch) |>
+    tibble::rowid_to_column() |>
+    tidyr::pivot_wider(names_from = batch, values_from = var) |>
+    dplyr::select(-.data$rowid) |>
+    dplyr::select_if(~ !all(is.na(.))) |>
+    as.matrix() |>
+    limma::normalizeQuantiles() |>
+    tibble::as_tibble() |>
     dplyr::transmute(
       result = purrr::pmap_dbl(
         .l = .,
@@ -26,6 +26,6 @@ batch_quantnorm <- function(var, batch) {
         true = NA_real_,
         false = .data$result
       )
-    ) %>%
+    ) |>
     dplyr::pull(.data$result)
 }

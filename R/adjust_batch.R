@@ -185,17 +185,17 @@ adjust_batch <- function(
 ) {
   method <- as.character(dplyr::enexpr(method))
   allmethods <- c("simple", "standardize", "ipw", "quantreg", "quantnorm")
-  data_orig <- data %>%
+  data_orig <- data |>
     dplyr::mutate(.id = dplyr::row_number())
-  data <- data_orig %>%
-    dplyr::rename(.batchvar = {{ batch }}) %>%
+  data <- data_orig |>
+    dplyr::rename(.batchvar = {{ batch }}) |>
     dplyr::mutate(
       .batchvar = factor(.data$.batchvar),
       .batchvar = factor_drop(.data$.batchvar)
-    ) %>%
+    ) |>
     dplyr::select(.data$.id, .data$.batchvar, {{ markers }}, {{ confounders }})
-  confounders <- data %>%
-    dplyr::select({{ confounders }}) %>%
+  confounders <- data |>
+    dplyr::select({{ confounders }}) |>
     names()
 
   # Check inputs: method and confounders
@@ -212,8 +212,8 @@ adjust_batch <- function(
 
   if (
     method %in% c("simple", "quantnorm") &
-      data %>%
-        dplyr::select({{ confounders }}) %>%
+      data |>
+        dplyr::select({{ confounders }}) |>
         ncol() >
         0
   ) {
@@ -225,7 +225,7 @@ adjust_batch <- function(
       paste(dplyr::enexpr(confounders), sep = ", ", collapse = ", "),
       "). They will be ignored."
     ))
-    data <- data %>% dplyr::select(-dplyr::any_of({{ confounders }}))
+    data <- data |> dplyr::select(-dplyr::any_of({{ confounders }}))
     confounders <- NULL
   }
 
@@ -234,8 +234,8 @@ adjust_batch <- function(
     if (
       method %in%
         c("standardize", "ipw") &
-        data %>%
-          dplyr::select({{ confounders }}) %>%
+        data |>
+          dplyr::select({{ confounders }}) |>
           ncol() ==
           0
     ) {
@@ -272,27 +272,27 @@ adjust_batch <- function(
       suffix <- paste0("_adj", method_indices[method[1]])
     }
 
-    values <- data %>%
-      dplyr::select(-dplyr::any_of({{ confounders }})) %>%
+    values <- data |>
+      dplyr::select(-dplyr::any_of({{ confounders }})) |>
       tidyr::pivot_longer(
         cols = c(-.data$.id, -.data$.batchvar),
         names_to = "marker",
         values_to = "value"
-      ) %>%
-      dplyr::left_join(adjust_parameters, by = c("marker", ".batchvar")) %>%
+      ) |>
+      dplyr::left_join(adjust_parameters, by = c("marker", ".batchvar")) |>
       dplyr::mutate(
         value_adjusted = .data$value - .data$batchmean,
         marker = paste0(.data$marker, suffix)
-      ) %>%
+      ) |>
       dplyr::select(-.data$batchmean, -.data$value)
   }
 
   # Quantile regression
   if (method == "quantreg") {
     res <- purrr::map(
-      .x = data %>% dplyr::select({{ markers }}) %>% names(),
+      .x = data |> dplyr::select({{ markers }}) |> names(),
       .f = batchrq,
-      data = data %>%
+      data = data |>
         dplyr::filter(dplyr::across(
           dplyr::all_of({{ confounders }}),
           ~ !is.na(.x)
@@ -320,7 +320,7 @@ adjust_batch <- function(
       suffix <- "_adj5"
     }
 
-    values <- data %>%
+    values <- data |>
       tidyr::pivot_longer(
         cols = c(
           -.data$.id,
@@ -329,9 +329,9 @@ adjust_batch <- function(
         ),
         names_to = "marker",
         values_to = "value"
-      ) %>%
-      dplyr::left_join(adjust_parameters, by = c("marker", ".batchvar")) %>%
-      dplyr::group_by(.data$marker) %>%
+      ) |>
+      dplyr::left_join(adjust_parameters, by = c("marker", ".batchvar")) |>
+      dplyr::group_by(.data$marker) |>
       dplyr::mutate(
         value_adjusted = (.data$value - .data$un_lo) /
           .data$un_iq *
@@ -341,7 +341,7 @@ adjust_batch <- function(
           .data$ad_lo +
           .data$un_lo,
         marker = paste0(.data$marker, suffix)
-      ) %>%
+      ) |>
       dplyr::select(
         -dplyr::any_of({{ confounders }}),
         -.data$value,
@@ -361,50 +361,50 @@ adjust_batch <- function(
     if (suffix == "_adjX") {
       suffix <- "_adj6"
     }
-    values <- data %>%
-      dplyr::select(-dplyr::any_of({{ confounders }})) %>%
+    values <- data |>
+      dplyr::select(-dplyr::any_of({{ confounders }})) |>
       tidyr::pivot_longer(
         cols = c(-.data$.id, -.data$.batchvar),
         names_to = "marker",
         values_to = "value"
-      ) %>%
-      dplyr::mutate(marker = paste0(.data$marker, suffix)) %>%
-      dplyr::group_by(.data$marker) %>%
+      ) |>
+      dplyr::mutate(marker = paste0(.data$marker, suffix)) |>
+      dplyr::group_by(.data$marker) |>
       dplyr::mutate(
         value_adjusted = batch_quantnorm(
           var = .data$value,
           batch = .data$.batchvar
         )
-      ) %>%
-      dplyr::ungroup() %>%
+      ) |>
+      dplyr::ungroup() |>
       dplyr::select(-.data$value)
     res <- list(list(res = NULL, models = NULL))
     adjust_parameters <- tibble::tibble(
-      marker = data %>%
-        dplyr::select({{ markers }}) %>%
+      marker = data |>
+        dplyr::select({{ markers }}) |>
         names()
     )
   }
 
   # Dataset to return
-  values <- values %>%
+  values <- values |>
     tidyr::pivot_wider(
       names_from = .data$marker,
       values_from = .data$value_adjusted
-    ) %>%
-    dplyr::select(-.data$.batchvar) %>%
-    dplyr::left_join(x = data_orig, by = ".id") %>%
+    ) |>
+    dplyr::select(-.data$.batchvar) |>
+    dplyr::left_join(x = data_orig, by = ".id") |>
     dplyr::select(-.data$.id)
 
   # Meta-data to return as attribute
   attr_list <- list(
     adjust_method = method,
-    markers = data_orig %>%
-      dplyr::select({{ markers }}) %>%
+    markers = data_orig |>
+      dplyr::select({{ markers }}) |>
       names(),
     suffix = suffix,
-    batchvar = data_orig %>%
-      dplyr::select({{ batch }}) %>%
+    batchvar = data_orig |>
+      dplyr::select({{ batch }}) |>
       names(),
     confounders = dplyr::enexpr(confounders),
     adjust_parameters = adjust_parameters,

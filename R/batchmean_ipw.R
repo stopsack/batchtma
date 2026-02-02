@@ -15,13 +15,13 @@ batchmean_ipw <- function(
   truncate = c(0.025, 0.975)
 ) {
   ipwbatch <- function(data, variable, confounders, truncate) {
-    data <- data %>%
-      dplyr::rename(variable = dplyr::one_of(variable)) %>%
-      dplyr::filter(!is.na(.data$variable)) %>%
+    data <- data |>
+      dplyr::rename(variable = dplyr::one_of(variable)) |>
+      dplyr::filter(!is.na(.data$variable)) |>
       dplyr::mutate(.batchvar = factor_drop(.data$.batchvar))
 
-    res <- data %>%
-      tidyr::nest(data = dplyr::everything()) %>%
+    res <- data |>
+      tidyr::nest(data = dplyr::everything()) |>
       dplyr::mutate(
         num = purrr::map(
           .x = .data$data,
@@ -43,17 +43,17 @@ batchmean_ipw <- function(
         )
       )
 
-    values <- res %>%
+    values <- res |>
       dplyr::mutate_at(
         .vars = dplyr::vars(.data$num, .data$den),
-        .funs = ~ purrr::map(.x = ., .f = stats::predict, type = "probs") %>%
-          purrr::map(.x = ., .f = tibble::as_tibble) %>%
+        .funs = ~ purrr::map(.x = ., .f = stats::predict, type = "probs") |>
+          purrr::map(.x = ., .f = tibble::as_tibble) |>
           purrr::map2(
             .x = .,
             .y = .data$data,
-            .f = ~ .x %>%
+            .f = ~ .x |>
               dplyr::mutate(
-                .batchvar = .y %>%
+                .batchvar = .y |>
                   purrr::pluck(".batchvar")
               )
           )
@@ -62,43 +62,43 @@ batchmean_ipw <- function(
     # multinom()$fitted.values is just a vector of probabilities for
     # the 2nd outcome level if there are only two levels
     if (length(levels(factor(data$.batchvar))) == 2) {
-      values <- values %>%
+      values <- values |>
         dplyr::mutate_at(
           .vars = dplyr::vars(.data$num, .data$den),
           .funs = ~ purrr::map(
             .x = .,
-            .f = ~ .x %>%
+            .f = ~ .x |>
               dplyr::mutate(
                 probs = dplyr::if_else(
                   .data$.batchvar == levels(factor(.data$.batchvar))[1],
                   true = 1 - .data$value,
                   false = .data$value
                 )
-              ) %>%
+              ) |>
               dplyr::pull(.data$probs)
           )
         )
       # otherwise probabilities are a data frame
     } else {
-      values <- values %>%
+      values <- values |>
         dplyr::mutate_at(
           .vars = dplyr::vars(.data$num, .data$den),
           .funs = ~ purrr::map(
             .x = .,
-            .f = ~ .x %>%
+            .f = ~ .x |>
               tidyr::pivot_longer(
                 -.data$.batchvar,
                 names_to = "batch",
                 values_to = "prob"
-              ) %>%
-              dplyr::filter(.data$batch == .data$.batchvar) %>%
+              ) |>
+              dplyr::filter(.data$batch == .data$.batchvar) |>
               dplyr::pull(.data$prob)
           )
         )
     }
 
-    values <- values %>%
-      tidyr::unnest(cols = c(.data$data, .data$num, .data$den)) %>%
+    values <- values |>
+      tidyr::unnest(cols = c(.data$data, .data$num, .data$den)) |>
       dplyr::mutate(
         sw = .data$num / .data$den,
         trunc = dplyr::case_when(
@@ -110,7 +110,7 @@ batchmean_ipw <- function(
         )
       )
 
-    xlev <- unique(data %>% dplyr::pull(.data$.batchvar))
+    xlev <- unique(data |> dplyr::pull(.data$.batchvar))
 
     values <- geepack::geeglm(
       formula = variable ~ .batchvar,
@@ -118,14 +118,14 @@ batchmean_ipw <- function(
       weights = values$trunc,
       id = values$.id,
       corstr = "independence"
-    ) %>%
-      broom::tidy() %>%
+    ) |>
+      broom::tidy() |>
       dplyr::filter(
         !stringr::str_detect(
           string = .data$term,
           pattern = "(Intercept)"
         )
-      ) %>%
+      ) |>
       dplyr::mutate(
         term = as.character(
           stringr::str_remove_all(
@@ -133,11 +133,11 @@ batchmean_ipw <- function(
             pattern = ".batchvar"
           )
         )
-      ) %>%
+      ) |>
       dplyr::full_join(
         tibble::tibble(term = as.character(xlev)),
         by = "term"
-      ) %>%
+      ) |>
       dplyr::mutate(
         estimate = dplyr::if_else(
           is.na(.data$estimate),
@@ -147,20 +147,20 @@ batchmean_ipw <- function(
         estimate = .data$estimate - mean(.data$estimate),
         marker = variable,
         term = .data$term
-      ) %>%
-      dplyr::arrange(.data$term) %>%
+      ) |>
+      dplyr::arrange(.data$term) |>
       dplyr::select(
         .data$marker,
         .batchvar = .data$term,
         batchmean = .data$estimate
       )
-    list(values = values, models = res %>% dplyr::pull(.data$den))
+    list(values = values, models = res |> dplyr::pull(.data$den))
   }
 
   purrr::map(
-    .x = data %>% dplyr::select({{ markers }}) %>% names(),
+    .x = data |> dplyr::select({{ markers }}) |> names(),
     .f = ipwbatch,
-    data = data %>%
+    data = data |>
       dplyr::filter(dplyr::across(dplyr::all_of(confounders), ~ !is.na(.x))),
     truncate = truncate,
     confounders = paste(confounders, sep = " + ", collapse = " + ")
