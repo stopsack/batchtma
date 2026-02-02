@@ -49,7 +49,7 @@ batchmean_ipw <- function(
 
     values <- res |>
       dplyr::mutate_at(
-        .vars = dplyr::vars(.data$num, .data$den),
+        .vars = c("num", "den"),
         .funs = \(num_den) {
           purrr::map(
             .x = num_den,
@@ -57,16 +57,13 @@ batchmean_ipw <- function(
               stats::predict(
                 x,
                 type = "probs"
-              )
+              ) |>
+                tibble::as_tibble()
             }
           ) |>
-            purrr::map(
-              .x = _,
-              .f = tibble::as_tibble
-            ) |>
             purrr::map2(
               .x = _,
-              .y = .data$data,
+              .y = res$data,
               .f = \(x, y) {
                 x |>
                   dplyr::mutate(
@@ -83,7 +80,7 @@ batchmean_ipw <- function(
     if (length(levels(factor(data$.batchvar))) == 2) {
       values <- values |>
         dplyr::mutate_at(
-          .vars = dplyr::vars(.data$num, .data$den),
+          .vars = dplyr::vars("num", "den"),
           .funs = \(num_den) {
             purrr::map(
               .x = num_den,
@@ -125,7 +122,7 @@ batchmean_ipw <- function(
     }
 
     values <- values |>
-      tidyr::unnest(cols = c(.data$data, .data$num, .data$den)) |>
+      tidyr::unnest(cols = c("data", "num", "den")) |>
       dplyr::mutate(
         sw = .data$num / .data$den,
         trunc = dplyr::case_when(
@@ -177,15 +174,21 @@ batchmean_ipw <- function(
       ) |>
       dplyr::arrange(.data$term) |>
       dplyr::select(
-        .data$marker,
-        .batchvar = .data$term,
-        batchmean = .data$estimate
+        "marker",
+        .batchvar = "term",
+        batchmean = "estimate"
       )
-    list(values = values, models = res |> dplyr::pull(.data$den))
+    list(
+      values = values,
+      models = res |>
+        dplyr::pull(.data$den)
+    )
   }
 
   purrr::map(
-    .x = data |> dplyr::select({{ markers }}) |> names(),
+    .x = data |>
+      dplyr::select({{ markers }}) |>
+      names(),
     .f = ipwbatch,
     data = data |>
       dplyr::filter(

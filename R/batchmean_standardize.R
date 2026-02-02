@@ -16,7 +16,7 @@ batchmean_standardize <- function(data, markers, confounders) {
     ) |>
     dplyr::filter(!is.na(.data$value)) |>
     dplyr::group_by(.data$marker) |>
-    tidyr::nest(data = c(-.data$marker)) |>
+    tidyr::nest(data = !"marker") |>
     dplyr::mutate(
       data = purrr::map(
         .x = .data$data,
@@ -52,7 +52,7 @@ batchmean_standardize <- function(data, markers, confounders) {
     )
 
   values <- res |>
-    tidyr::unnest(cols = .data$.batchvar) |>
+    tidyr::unnest(cols = ".batchvar") |>
     dplyr::mutate(
       data = purrr::map2(
         .x = .data$data,
@@ -68,8 +68,8 @@ batchmean_standardize <- function(data, markers, confounders) {
         .f = stats::predict
       )
     ) |>
-    dplyr::select(.data$marker, .data$.batchvar, .data$pred) |>
-    tidyr::unnest(cols = .data$pred) |>
+    dplyr::select("marker", ".batchvar", "pred") |>
+    tidyr::unnest(cols = "pred") |>
     dplyr::group_by(.data$marker, .data$.batchvar) |>
     dplyr::summarize(batchmean = mean(.data$pred, na.rm = TRUE)) |>
     dplyr::group_by(.data$marker) |>
@@ -81,7 +81,9 @@ batchmean_standardize <- function(data, markers, confounders) {
       batchmean = .data$batchmean - .data$markermean
     )
   return(list(list(
-    models = res |> dplyr::ungroup() |> dplyr::pull("model"),
+    models = res |>
+      dplyr::ungroup() |>
+      dplyr::pull("model"),
     values = values
   )))
 }

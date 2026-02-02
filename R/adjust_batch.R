@@ -187,7 +187,7 @@ adjust_batch <- function(
       .batchvar = factor(.data$.batchvar),
       .batchvar = factor_drop(.data$.batchvar)
     ) |>
-    dplyr::select(.data$.id, .data$.batchvar, {{ markers }}, {{ confounders }})
+    dplyr::select(".id", ".batchvar", {{ markers }}, {{ confounders }})
   confounders <- data |>
     dplyr::select({{ confounders }}) |>
     names()
@@ -219,7 +219,7 @@ adjust_batch <- function(
       paste(dplyr::enexpr(confounders), sep = ", ", collapse = ", "),
       "). They will be ignored."
     ))
-    data <- data |> dplyr::select(-dplyr::any_of({{ confounders }}))
+    data <- data |> dplyr::select(!dplyr::any_of({{ confounders }}))
     confounders <- NULL
   }
 
@@ -267,24 +267,29 @@ adjust_batch <- function(
     }
 
     values <- data |>
-      dplyr::select(-dplyr::any_of({{ confounders }})) |>
+      dplyr::select(!dplyr::any_of({{ confounders }})) |>
       tidyr::pivot_longer(
-        cols = c(-.data$.id, -.data$.batchvar),
+        cols = !c(".id", ".batchvar"),
         names_to = "marker",
         values_to = "value"
       ) |>
-      dplyr::left_join(adjust_parameters, by = c("marker", ".batchvar")) |>
+      dplyr::left_join(
+        adjust_parameters,
+        by = c("marker", ".batchvar")
+      ) |>
       dplyr::mutate(
         value_adjusted = .data$value - .data$batchmean,
         marker = paste0(.data$marker, suffix)
       ) |>
-      dplyr::select(-.data$batchmean, -.data$value)
+      dplyr::select(!c("batchmean", "value"))
   }
 
   # Quantile regression
   if (method == "quantreg") {
     res <- purrr::map(
-      .x = data |> dplyr::select({{ markers }}) |> names(),
+      .x = data |>
+        dplyr::select({{ markers }}) |>
+        names(),
       .f = batchrq,
       data = data |>
         dplyr::filter(
@@ -318,15 +323,18 @@ adjust_batch <- function(
 
     values <- data |>
       tidyr::pivot_longer(
-        cols = c(
-          -.data$.id,
-          -.data$.batchvar,
-          -dplyr::any_of({{ confounders }})
+        cols = !c(
+          ".id",
+          ".batchvar",
+          dplyr::any_of({{ confounders }})
         ),
         names_to = "marker",
         values_to = "value"
       ) |>
-      dplyr::left_join(adjust_parameters, by = c("marker", ".batchvar")) |>
+      dplyr::left_join(
+        adjust_parameters,
+        by = c("marker", ".batchvar")
+      ) |>
       dplyr::group_by(.data$marker) |>
       dplyr::mutate(
         value_adjusted = (.data$value - .data$un_lo) /
@@ -339,16 +347,18 @@ adjust_batch <- function(
         marker = paste0(.data$marker, suffix)
       ) |>
       dplyr::select(
-        -dplyr::any_of({{ confounders }}),
-        -.data$value,
-        -.data$un_lo,
-        -.data$un_hi,
-        -.data$ad_lo,
-        -.data$ad_hi,
-        -.data$un_iq,
-        -.data$ad_iq,
-        -.data$all_iq,
-        -.data$all_lo
+        !c(
+          dplyr::any_of({{ confounders }}),
+          "value",
+          "un_lo",
+          "un_hi",
+          "ad_lo",
+          "ad_hi",
+          "un_iq",
+          "ad_iq",
+          "all_iq",
+          "all_lo"
+        )
       )
   }
 
@@ -358,9 +368,9 @@ adjust_batch <- function(
       suffix <- "_adj6"
     }
     values <- data |>
-      dplyr::select(-dplyr::any_of({{ confounders }})) |>
+      dplyr::select(!dplyr::any_of({{ confounders }})) |>
       tidyr::pivot_longer(
-        cols = c(-.data$.id, -.data$.batchvar),
+        cols = !c(".id", ".batchvar"),
         names_to = "marker",
         values_to = "value"
       ) |>
@@ -373,7 +383,7 @@ adjust_batch <- function(
         )
       ) |>
       dplyr::ungroup() |>
-      dplyr::select(-.data$value)
+      dplyr::select(!"value")
     res <- list(list(res = NULL, models = NULL))
     adjust_parameters <- tibble::tibble(
       marker = data |>
@@ -385,12 +395,15 @@ adjust_batch <- function(
   # Dataset to return
   values <- values |>
     tidyr::pivot_wider(
-      names_from = .data$marker,
-      values_from = .data$value_adjusted
+      names_from = "marker",
+      values_from = "value_adjusted"
     ) |>
-    dplyr::select(-.data$.batchvar) |>
-    dplyr::left_join(x = data_orig, by = ".id") |>
-    dplyr::select(-.data$.id)
+    dplyr::select(!".batchvar") |>
+    dplyr::left_join(
+      x = data_orig,
+      by = ".id"
+    ) |>
+    dplyr::select(!".id")
 
   # Meta-data to return as attribute
   attr_list <- list(

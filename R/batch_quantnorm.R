@@ -12,7 +12,7 @@ batch_quantnorm <- function(var, batch) {
       names_from = batch,
       values_from = var
     ) |>
-    dplyr::select(-.data$rowid) |>
+    dplyr::select(!"rowid") |>
     dplyr::select(dplyr::where(\(x) !all(is.na(x)))) |>
     as.matrix() |>
     limma::normalizeQuantiles() |>

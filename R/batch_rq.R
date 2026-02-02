@@ -51,7 +51,7 @@ batchrq <- function(data, variable, confounders, tau, rq_method) {
     )
 
   values <- res |>
-    tidyr::unnest(cols = .data$.batchvar) |>
+    tidyr::unnest(cols = ".batchvar") |>
     dplyr::mutate(
       data = purrr::map2(
         .x = .data$data,
@@ -100,14 +100,14 @@ batchrq <- function(data, variable, confounders, tau, rq_method) {
       all_iq = .data$all_hi - .data$all_lo
     ) |>
     dplyr::select(
-      .data$.batchvar,
-      .data$un,
-      .data$ad,
-      .data$all_lo,
-      .data$all_hi,
-      .data$all_iq
+      ".batchvar",
+      "un",
+      "ad",
+      "all_lo",
+      "all_hi",
+      "all_iq"
     ) |>
-    tidyr::unnest(cols = c(.data$un, .data$ad)) |>
+    tidyr::unnest(cols = c("un", "ad")) |>
     dplyr::group_by(.data$.batchvar) |>
     dplyr::summarize(
       un_lo = stats::quantile(.data$un_lo, probs = 0.25),
