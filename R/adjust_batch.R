@@ -1,6 +1,8 @@
 # as per https://github.com/jennybc/googlesheets/blob/master/R/googlesheets.R:
 ## quiets concerns of R CMD check re: the .'s that appear in pipelines
-if (getRversion() >= "2.15.1") utils::globalVariables(c("."))
+if (getRversion() >= "2.15.1") {
+  utils::globalVariables(c("."))
+}
 
 #' Adjust for batch effects
 #'
@@ -208,10 +210,13 @@ adjust_batch <- function(
     ))
   }
 
-  if (method %in% c("simple", "quantnorm") &
-    data %>%
-      dplyr::select({{ confounders }}) %>%
-      ncol() > 0) {
+  if (
+    method %in% c("simple", "quantnorm") &
+      data %>%
+        dplyr::select({{ confounders }}) %>%
+        ncol() >
+        0
+  ) {
     message(paste0(
       "Batch effect correction via 'method = ",
       method,
@@ -226,10 +231,14 @@ adjust_batch <- function(
 
   # Mean-based methods
   if (method %in% c("simple", "standardize", "ipw")) {
-    if (method %in% c("standardize", "ipw") &
-      data %>%
-        dplyr::select({{ confounders }}) %>%
-        ncol() == 0) {
+    if (
+      method %in%
+        c("standardize", "ipw") &
+        data %>%
+          dplyr::select({{ confounders }}) %>%
+          ncol() ==
+          0
+    ) {
       message(paste0(
         "Batch effect correction via 'method = ",
         method,
@@ -254,7 +263,10 @@ adjust_batch <- function(
         truncate = ipw_truncate
       )
     )
-    adjust_parameters <- purrr::map_dfr(.x = res, .f = ~ purrr::pluck(.x, "values"))
+    adjust_parameters <- purrr::map_dfr(
+      .x = res,
+      .f = ~ purrr::pluck(.x, "values")
+    )
     method_indices <- c("simple" = 2, "standardize" = 3, "ipw" = 4)
     if (suffix == "_adjX") {
       suffix <- paste0("_adj", method_indices[method[1]])
@@ -281,7 +293,10 @@ adjust_batch <- function(
       .x = data %>% dplyr::select({{ markers }}) %>% names(),
       .f = batchrq,
       data = data %>%
-        dplyr::filter(dplyr::across(dplyr::all_of({{ confounders }}), ~ !is.na(.x))),
+        dplyr::filter(dplyr::across(
+          dplyr::all_of({{ confounders }}),
+          ~ !is.na(.x)
+        )),
       confounders = dplyr::if_else(
         dplyr::enexpr(confounders) != "",
         true = paste0(
@@ -297,7 +312,10 @@ adjust_batch <- function(
       tau = quantreg_tau,
       rq_method = quantreg_method
     )
-    adjust_parameters <- purrr::map_dfr(.x = res, .f = ~ purrr::pluck(.x, "values"))
+    adjust_parameters <- purrr::map_dfr(
+      .x = res,
+      .f = ~ purrr::pluck(.x, "values")
+    )
     if (suffix == "_adjX") {
       suffix <- "_adj5"
     }
@@ -316,8 +334,12 @@ adjust_batch <- function(
       dplyr::group_by(.data$marker) %>%
       dplyr::mutate(
         value_adjusted = (.data$value - .data$un_lo) /
-          .data$un_iq * .data$all_iq * (.data$un_iq / .data$ad_iq) +
-          .data$all_lo - .data$ad_lo + .data$un_lo,
+          .data$un_iq *
+          .data$all_iq *
+          (.data$un_iq / .data$ad_iq) +
+          .data$all_lo -
+          .data$ad_lo +
+          .data$un_lo,
         marker = paste0(.data$marker, suffix)
       ) %>%
       dplyr::select(
@@ -348,15 +370,20 @@ adjust_batch <- function(
       ) %>%
       dplyr::mutate(marker = paste0(.data$marker, suffix)) %>%
       dplyr::group_by(.data$marker) %>%
-      dplyr::mutate(value_adjusted = batch_quantnorm(
-        var = .data$value,
-        batch = .data$.batchvar
-      )) %>%
+      dplyr::mutate(
+        value_adjusted = batch_quantnorm(
+          var = .data$value,
+          batch = .data$.batchvar
+        )
+      ) %>%
       dplyr::ungroup() %>%
       dplyr::select(-.data$value)
     res <- list(list(res = NULL, models = NULL))
-    adjust_parameters <- tibble::tibble(marker = data %>%
-      dplyr::select({{ markers }}) %>% names())
+    adjust_parameters <- tibble::tibble(
+      marker = data %>%
+        dplyr::select({{ markers }}) %>%
+        names()
+    )
   }
 
   # Dataset to return
@@ -372,12 +399,19 @@ adjust_batch <- function(
   # Meta-data to return as attribute
   attr_list <- list(
     adjust_method = method,
-    markers = data_orig %>% dplyr::select({{ markers }}) %>% names(),
+    markers = data_orig %>%
+      dplyr::select({{ markers }}) %>%
+      names(),
     suffix = suffix,
-    batchvar = data_orig %>% dplyr::select({{ batch }}) %>% names(),
+    batchvar = data_orig %>%
+      dplyr::select({{ batch }}) %>%
+      names(),
     confounders = dplyr::enexpr(confounders),
     adjust_parameters = adjust_parameters,
-    model_fits = purrr::map(.x = res, .f = ~ purrr::pluck(.x, "models"))
+    model_fits = purrr::map(
+      .x = res,
+      .f = ~ purrr::pluck(.x, "models")
+    )
   )
   class(attr_list) <- c("batchtma", class(res))
   attr(values, which = ".batchtma") <- attr_list

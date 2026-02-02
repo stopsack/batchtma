@@ -9,10 +9,10 @@
 #' @return Tibble of batch means per batch and marker
 #' @noRd
 batchmean_ipw <- function(
-    data,
-    markers,
-    confounders,
-    truncate = c(0.025, 0.975)
+  data,
+  markers,
+  confounders,
+  truncate = c(0.025, 0.975)
 ) {
   ipwbatch <- function(data, variable, confounders, truncate) {
     data <- data %>%
@@ -52,8 +52,10 @@ batchmean_ipw <- function(
             .x = .,
             .y = .data$data,
             .f = ~ .x %>%
-              dplyr::mutate(.batchvar = .y %>%
-                              purrr::pluck(".batchvar"))
+              dplyr::mutate(
+                .batchvar = .y %>%
+                  purrr::pluck(".batchvar")
+              )
           )
       )
 
@@ -63,34 +65,35 @@ batchmean_ipw <- function(
       values <- values %>%
         dplyr::mutate_at(
           .vars = dplyr::vars(.data$num, .data$den),
-          .funs = ~ purrr::map(.x = ., .f = ~ .x %>%
-                                 dplyr::mutate(
-                                   probs = dplyr::if_else(
-                                     .data$.batchvar ==
-                                       levels(factor(.data$.batchvar))[1],
-                                     true = 1 - .data$value,
-                                     false = .data$value
-                                   )
-                                 ) %>%
-                                 dplyr::pull(.data$probs))
+          .funs = ~ purrr::map(
+            .x = .,
+            .f = ~ .x %>%
+              dplyr::mutate(
+                probs = dplyr::if_else(
+                  .data$.batchvar == levels(factor(.data$.batchvar))[1],
+                  true = 1 - .data$value,
+                  false = .data$value
+                )
+              ) %>%
+              dplyr::pull(.data$probs)
+          )
         )
       # otherwise probabilities are a data frame
     } else {
       values <- values %>%
         dplyr::mutate_at(
           .vars = dplyr::vars(.data$num, .data$den),
-          .funs =
-            ~ purrr::map(
-              .x = .,
-              .f = ~ .x %>%
-                tidyr::pivot_longer(
-                  -.data$.batchvar,
-                  names_to = "batch",
-                  values_to = "prob"
-                ) %>%
-                dplyr::filter(.data$batch == .data$.batchvar) %>%
-                dplyr::pull(.data$prob)
-            )
+          .funs = ~ purrr::map(
+            .x = .,
+            .f = ~ .x %>%
+              tidyr::pivot_longer(
+                -.data$.batchvar,
+                names_to = "batch",
+                values_to = "prob"
+              ) %>%
+              dplyr::filter(.data$batch == .data$.batchvar) %>%
+              dplyr::pull(.data$prob)
+          )
         )
     }
 
@@ -117,17 +120,24 @@ batchmean_ipw <- function(
       corstr = "independence"
     ) %>%
       broom::tidy() %>%
-      dplyr::filter(!stringr::str_detect(
-        string = .data$term,
-        pattern = "(Intercept)"
-      )) %>%
-      dplyr::mutate(term = as.character(
-        stringr::str_remove_all(
+      dplyr::filter(
+        !stringr::str_detect(
           string = .data$term,
-          pattern = ".batchvar"
+          pattern = "(Intercept)"
         )
-      )) %>%
-      dplyr::full_join(tibble::tibble(term = as.character(xlev)), by = "term") %>%
+      ) %>%
+      dplyr::mutate(
+        term = as.character(
+          stringr::str_remove_all(
+            string = .data$term,
+            pattern = ".batchvar"
+          )
+        )
+      ) %>%
+      dplyr::full_join(
+        tibble::tibble(term = as.character(xlev)),
+        by = "term"
+      ) %>%
       dplyr::mutate(
         estimate = dplyr::if_else(
           is.na(.data$estimate),
@@ -139,7 +149,11 @@ batchmean_ipw <- function(
         term = .data$term
       ) %>%
       dplyr::arrange(.data$term) %>%
-      dplyr::select(.data$marker, .batchvar = .data$term, batchmean = .data$estimate)
+      dplyr::select(
+        .data$marker,
+        .batchvar = .data$term,
+        batchmean = .data$estimate
+      )
     list(values = values, models = res %>% dplyr::pull(.data$den))
   }
 
