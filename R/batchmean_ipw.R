@@ -113,7 +113,7 @@ batchmean_ipw <- function(
                 .f = \(x) {
                   x |>
                     tidyr::pivot_longer(
-                      cols = c(!".batchvar"),
+                      cols = !".batchvar",
                       names_to = "batch",
                       values_to = "prob"
                     ) |>
