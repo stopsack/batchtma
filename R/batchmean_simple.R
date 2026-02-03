@@ -26,7 +26,7 @@ batchmean_simple <- function(data, markers) {
       )
     ) |>
     tidyr::pivot_longer(
-      col = !".batchvar",
+      cols = !".batchvar",
       names_to = "marker",
       values_to = "batchmean"
     )
