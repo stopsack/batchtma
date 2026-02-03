@@ -75,10 +75,11 @@ batchmean_standardize <- function(data, markers, confounders) {
     dplyr::group_by(.data$marker) |>
     dplyr::mutate(markermean = mean(.data$batchmean)) |>
     dplyr::ungroup() |>
-    dplyr::transmute(
+    dplyr::mutate(
       marker = .data$marker,
       .batchvar = .data$.batchvar,
-      batchmean = .data$batchmean - .data$markermean
+      batchmean = .data$batchmean - .data$markermean,
+      .keep = "none"
     )
   return(list(list(
     models = res |>
