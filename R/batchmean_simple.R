@@ -10,14 +10,20 @@ batchmean_simple <- function(data, markers) {
   values <- data |>
     dplyr::select(".id", ".batchvar", {{ markers }}) |>
     dplyr::group_by(.data$.batchvar) |>
-    dplyr::summarize_at(
-      .vars = dplyr::vars(!".id"),
-      .funs = mean,
-      na.rm = TRUE
+    dplyr::summarize(
+      dplyr::across(
+        .cols = !".id",
+        .fns = \(x) mean(
+          x,
+          na.rm = TRUE
+        )
+      )
     ) |>
-    dplyr::mutate_at(
-      .vars = dplyr::vars(!".batchvar"),
-      .funs = \(x) x - mean(x, na.rm = TRUE)
+    dplyr::mutate(
+      dplyr::across(
+        .cols = !".batchvar",
+        .fns = \(x) x - mean(x, na.rm = TRUE)
+      )
     ) |>
     tidyr::pivot_longer(
       col = !".batchvar",

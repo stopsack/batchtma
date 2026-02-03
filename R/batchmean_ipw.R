@@ -48,76 +48,81 @@ batchmean_ipw <- function(
       )
 
     values <- res |>
-      dplyr::mutate_at(
-        .vars = c("num", "den"),
-        .funs = \(num_den) {
-          purrr::map(
-            .x = num_den,
-            .f = \(x) {
-              stats::predict(
-                x,
-                type = "probs"
-              ) |>
-                tibble::as_tibble()
-            }
-          ) |>
-            purrr::map2(
-              .x = _,
-              .y = res$data,
-              .f = \(x, y) {
-                x |>
-                  dplyr::mutate(
-                    .batchvar = y |>
-                      purrr::pluck(".batchvar")
-                  )
+      dplyr::mutate(
+        dplyr::across(
+          .cols = c("num", "den"),
+          .fns = \(num_den) {
+            purrr::map(
+              .x = num_den,
+              .f = \(x) {
+                stats::predict(
+                  x,
+                  type = "probs"
+                ) |>
+                  tibble::as_tibble()
               }
-            )
-        }
+            ) |>
+              purrr::map2( # .x = _ # would require R 4.2.0
+                .y = res$data,
+                .f = \(x, y) {
+                  x |>
+                    dplyr::mutate(
+                      .batchvar = y |>
+                        purrr::pluck(".batchvar")
+                    )
+                }
+              )
+          }
+        )
       )
 
     # multinom()$fitted.values is just a vector of probabilities for
     # the 2nd outcome level if there are only two levels
     if (length(levels(factor(data$.batchvar))) == 2) {
       values <- values |>
-        dplyr::mutate_at(
-          .vars = dplyr::vars("num", "den"),
-          .funs = \(num_den) {
-            purrr::map(
-              .x = num_den,
-              .f = \(x) {
-                x |>
-                  dplyr::mutate(
-                    probs = dplyr::if_else(
-                      .data$.batchvar == levels(factor(.data$.batchvar))[1],
-                      true = 1 - .data$value,
-                      false = .data$value
-                    )
-                  ) |>
-                  dplyr::pull(.data$probs)
-              }
-            )
-          }
+        dplyr::mutate(
+          dplyr::across(
+            .cols = c("num", "den"),
+            .fns = \(num_den) {
+              purrr::map(
+                .x = num_den,
+                .f = \(x) {
+                  x |>
+                    dplyr::mutate(
+                      probs = dplyr::if_else(
+                        .data$.batchvar == levels(factor(.data$.batchvar))[1],
+                        true = 1 - .data$value,
+                        false = .data$value
+                      )
+                    ) |>
+                    dplyr::pull(.data$probs)
+                }
+              )
+            }
+          )
         )
       # otherwise probabilities are a data frame
     } else {
       values <- values |>
-        dplyr::mutate_at(
-          .vars = dplyr::vars(.data$num, .data$den),
-          .funs = \(num_den) {
-            purrr::map(
-              .x = num_den,
-              .f = \(x) {
-                x |>
-                  tidyr::pivot_longer(
-                    -.data$.batchvar,
-                    names_to = "batch",
-                    values_to = "prob"
-                  ) |>
-                  dplyr::filter(.data$batch == .data$.batchvar) |>
-                  dplyr::pull(.data$prob)
-              }
-            )
-          }
+        dplyr::mutate(
+          dplyr::across(
+            .cols = c("num", "den"),
+            .fns = \(num_den) {
+              purrr::map(
+                .x = num_den,
+                .f = \(x) {
+                  x |>
+                    tidyr::pivot_longer(
+                      cols = c(!".batchvar"),
+                      names_to = "batch",
+                      values_to = "prob"
+                    ) |>
+                    dplyr::filter(.data$batch == .data$.batchvar) |>
+                    dplyr::pull(.data$prob)
+                }
+              )
+            }
+          )
         )
     }
 
