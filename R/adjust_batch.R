@@ -193,6 +193,14 @@ adjust_batch <- function(
     names()
 
   # Check inputs: method and confounders
+  if(method[1] == "c") {
+    stop(paste0(
+      "No valid argument 'method =' provided. Available methods: ",
+      paste(allmethods, collapse = ", "),
+      ".\n",
+      "See: help(\"adjust_batch\")."
+    ))
+  }
   if (!(method[1] %in% allmethods)) {
     stop(paste0(
       "Method '",
