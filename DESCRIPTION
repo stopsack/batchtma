@@ -1,6 +1,6 @@
 Package: batchtma
 Title: Batch Effect Adjustments
-Version: 0.1.7-9000
+Version: 0.2.0
 Authors@R: 
     c(person(given = "Konrad",
            family = "Stopsack",

@@ -1,3 +1,15 @@
+# batchtma 0.2.0
+
+* Braking change: Require R >= 4.1
+* No other user-visible changes.
+* Internal changes:
+  + Replace long-deprecated `filter(across())` with `if_all()` to be {dplyr} 
+    1.2.0-compatible (#3, thanks to @DavisVaughan).
+  + Split code into multiple files.
+  + Use modern tidyselect, pipe, and anonymous functions.
+  + Add some unit tests.
+
+
 # batchtma 0.1.7
 
 * Separately call tidyverse packages
@@ -16,7 +28,7 @@
 
 # batchtma 0.1.4
 
-* Bioconductor limma dependency added for `remotes::install_github()``
+* Bioconductor limma dependency added for `remotes::install_github()`
 * Code review, updates to curly-curly, and tidyverse style changes,
   thanks to @tgerke
 
