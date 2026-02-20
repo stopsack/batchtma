@@ -18,13 +18,13 @@ knitr::opts_chunk$set(
 
 batchtma can be installed from [CRAN](https://cran.r-project.org/) using:
 
-```{r}
+```{r install_cran, eval = FALSE}
 install.packages("batchtma")
 ```
 
 To install a potentially newer version from [GitHub](https://github.com/), use:
 
-```{r}
+```{r install_github, eval = FALSE}
 # install.packages("remotes")  # The "remotes" package needs to be installed
 remotes::install_github("stopsack/batchtma")
 ```
