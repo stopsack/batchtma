@@ -63,7 +63,7 @@ df
 We plot the biomarker values (*y*-axis) by batch (*x*-axis), using the `plot_batch()` function. Color/shape symbolizes which participant/tumor the measurements came from. Boxes span from the 25th to the 75th percentile (interquartile range); thick lines indicate medians; asterisks indicate means.
 
 ```{r}
-df %>% plot_batch(marker = noisy, batch = batch, color = person)
+df |> plot_batch(marker = noisy, batch = batch, color = person)
 ```
 
 
@@ -72,14 +72,14 @@ df %>% plot_batch(marker = noisy, batch = batch, color = person)
 We add systematic differences between batches such that there is differential measurement error between batches in terms of mean and variance. As shown above, true values were the same beyond random error. 
 
 ```{r}
-df <- df %>%
+df <- df |>
   # Multiply by batch number to differentially change variance by batch,
   # divide by mean batch number to keep overall variance the same:
   mutate(noisy_batch = noisy * batchnum / mean(batchnum) + 
            # Similarly, change mean value per batch, keeping overall mean the same:
            batchnum * 3 - mean(batchnum) * 3)
 
-df %>% plot_batch(marker = noisy_batch, batch = batch, color = person)
+df |> plot_batch(marker = noisy_batch, batch = batch, color = person)
 ```
 
 
@@ -90,9 +90,9 @@ df %>% plot_batch(marker = noisy_batch, batch = batch, color = person)
 `method = simple` calculates the mean for each batch and subtracts the difference between this mean and the grand mean, such that all batches end up having a mean equivalent to the grand mean. Differences in variance between batches will remain, if they exist (as in this example).
 
 ```{r}
-df %>% 
+df |> 
   adjust_batch(markers = noisy_batch, batch = batch, 
-               method = simple) %>%
+               method = simple) |>
   plot_batch(marker = noisy_batch_adj2, batch = batch, color = person)
 ```
 
@@ -102,9 +102,9 @@ df %>%
 `method = standardize` performs marginal standardization by fitting a linear regression model for biomarker values with `batch` and `confounders` as predictors, and obtains the marginal means per batch if they had the same distribution of `confounders`. Differences between these marginal means and the grand mean are subtracted as in `method = simple`. In this example, the confounder is a random variable, and the results are essentially the same as for `method = simple`.
 
 ```{r}
-df %>% 
+df |> 
   adjust_batch(markers = noisy_batch, batch = batch, 
-               method = standardize, confounders = random) %>%
+               method = standardize, confounders = random) |>
   plot_batch(marker = noisy_batch_adj3, batch = batch, color = person)
 ```
 
@@ -114,9 +114,9 @@ df %>%
 `method = ipw` predicts the probability of a measurement being from a specific batch, given the `confounders`. Mean differences between batches are obtained from a marginal structural model with stabilized inverse-probability weights and then used as in the two preceding methods. Again, the confounder is merely a random variable in this example.
 
 ```{r}
-df %>% 
+df |> 
   adjust_batch(markers = noisy_batch, batch = batch, 
-               method = ipw, confounders = random) %>%
+               method = ipw, confounders = random) |>
   plot_batch(marker = noisy_batch_adj4, batch = batch, color = person)
 ```
 
@@ -126,9 +126,9 @@ df %>%
 `method = quantreg`, unlike the three preceding mean-only methods, addresses two distinct properties of batches: the offset values (a lower quantile), potentially reflective of background signal, and an inter-quantile range, potentially reflective of the dynamic range of the measurement. By default, the first and third qua**r**tile are used.
 
 ```{r}
-df %>% 
+df |> 
   adjust_batch(markers = noisy_batch, batch = batch, 
-               method = quantreg, confounders = random) %>%
+               method = quantreg, confounders = random) |>
   plot_batch(marker = noisy_batch_adj5, batch = batch, color = person)
 ```
 
@@ -137,9 +137,9 @@ df %>%
 `method = quantnorm` performs quantile normalization: values are ranked within each batch, and then each rank is assigned the mean per rank across batches. Quantile normalization ensures that all batches have near-identical biomarker distributions. However, quantile normalization does not allow for accounting for `confounders`.
 
 ```{r}
-df %>% 
+df |> 
   adjust_batch(markers = noisy_batch, batch = batch, 
-               method = quantnorm) %>%
+               method = quantnorm) |>
   plot_batch(marker = noisy_batch_adj6, batch = batch, color = person)
 ```
 
@@ -157,25 +157,25 @@ All following plots show color/symbol shape by `confounder`.
 
 ```{r}
 set.seed(123)  # for reproducibility
-df <- df %>%
+df <- df |>
   # Make confounder associated with batch:
   mutate(confounder = round(batchnum + runif(n = 200, max = 2)),
          # Make biomarker values associated with confounder:
          noisy_conf = noisy + confounder * 3 - mean(confounder) * 3)
 
-df %>% plot_batch(marker = noisy_conf, batch = batch, color = confounder)
+df |> plot_batch(marker = noisy_conf, batch = batch, color = confounder)
 ```
 
 
 Second, batch effects for mean and variance are added.
 
 ```{r}
-df <- df %>% 
+df <- df |> 
   # Add batch effects to confounded biomarker values:
   mutate(noisy_conf_batch = noisy_conf * batchnum / mean(batchnum) + 
            batchnum * 3 - mean(batchnum) * 3)
 
-df %>% plot_batch(marker = noisy_conf_batch, batch = batch, color = confounder)
+df |> plot_batch(marker = noisy_conf_batch, batch = batch, color = confounder)
 ```
 
 The following examples show to what extent batch effects can be removed from `noisy_conf_batch` to recover the "ground truth," `noisy_conf`.
@@ -186,9 +186,9 @@ The following examples show to what extent batch effects can be removed from `no
 `method = standardize` reduces batch effects while allowing batch means to differ because of confounders. Batches with higher true biomarker values associated with the confounders, like batch B, retain higher means after batch effect adjustment.
 
 ```{r}
-df %>% 
+df |> 
   adjust_batch(markers = noisy_conf_batch, batch = batch, 
-               method = standardize, confounders = confounder) %>%
+               method = standardize, confounders = confounder) |>
   plot_batch(marker = noisy_conf_batch_adj3, batch = batch, color = confounder)
 ```
 
@@ -198,9 +198,9 @@ df %>%
 `method = ipw` also reduces batch effects while allowing batch means to differ because of confounders. As with marginal standardization, differences in variance between batches are not addressed.
 
 ```{r}
-df %>% 
+df |> 
   adjust_batch(markers = noisy_conf_batch, batch = batch, 
-               method = ipw, confounders = confounder) %>%
+               method = ipw, confounders = confounder) |>
   plot_batch(marker = noisy_conf_batch_adj4, batch = batch, color = confounder)
 ```
 
@@ -210,9 +210,9 @@ df %>%
 `method = quantreg` reduces for batch effects of offset and dynamic range separately, accounting for differences in confounders. In the example, batch B with its high levels of the `confounder` retains somewhat higher values and a higher variance, unlike with the two preceding mean-only methods.
 
 ```{r}
-df %>% 
+df |> 
   adjust_batch(markers = noisy_conf_batch, batch = batch, 
-               method = quantreg, confounders = confounder) %>%
+               method = quantreg, confounders = confounder) |>
   plot_batch(marker = noisy_conf_batch_adj5, batch = batch, color = confounder)
 ```
 
@@ -224,9 +224,9 @@ df %>%
 `method = simple` leads to all batches having the same mean after adjustment. In the example, this method ignores that batch B should have higher values because of higher values of the `confounder`.
 
 ```{r}
-df %>% 
+df |> 
   adjust_batch(markers = noisy_conf_batch, batch = batch, 
-               method = simple, confounders = confounder) %>%
+               method = simple, confounders = confounder) |>
   plot_batch(marker = noisy_conf_batch_adj2, batch = batch, color = confounder)
 ```
 
@@ -236,9 +236,9 @@ df %>%
 `method = quantreg` also ignores the confounder.
 
 ```{r}
-df %>% 
+df |> 
   adjust_batch(markers = noisy_conf_batch, batch = batch, 
-               method = quantnorm, confounders = confounder) %>%
+               method = quantnorm, confounders = confounder) |>
   plot_batch(marker = noisy_conf_batch_adj6, batch = batch, color = confounder)
 ```
 
@@ -264,7 +264,7 @@ To obtain an overview of model diagnostics, `diagnose_models()` is called on the
 
 ```{r}
 # df2 is the new dataset that also contains "noisy_conf_batch_adj2":
-df2 <- df %>% adjust_batch(markers = noisy_conf_batch, batch = batch, 
+df2 <- df |> adjust_batch(markers = noisy_conf_batch, batch = batch, 
                            method = standardize, confounders = confounder)
 
 # Show overview of model diagnostics:
@@ -287,7 +287,7 @@ Diagnostics for regression models can be performed on fitted models just as for 
 
 ```{r}
 tibble(fitted    = fitted.values(fit),
-       residuals = residuals(fit)) %>%
+       residuals = residuals(fit)) |>
   ggplot(mapping = aes(x = fitted, y = residuals)) +
   geom_point() +
   theme_minimal()
