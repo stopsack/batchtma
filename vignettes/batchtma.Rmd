@@ -16,17 +16,17 @@ knitr::opts_chunk$set(
 
 # Installation
 
-Batchtma can be installed from [GitHub](https://github.com/) using:
+batchtma can be installed from [CRAN](https://cran.r-project.org/) using:
 
-```{r, eval = FALSE}
-# install.packages("remotes")  # The "remotes" package needs to be installed
-remotes::install_github("stopsack/batchtma")
+```{r}
+install.packages("batchtma")
 ```
 
-To have vignettes like this current site be available offline via, *e.g.*, `vignette("batchtma")`, modify the last command:
+To install a potentially newer version from [GitHub](https://github.com/), use:
 
-```{r, eval = FALSE}
-remotes::install_github("stopsack/batchtma", build_vignettes = TRUE)
+```{r}
+# install.packages("remotes")  # The "remotes" package needs to be installed
+remotes::install_github("stopsack/batchtma")
 ```
 
 
