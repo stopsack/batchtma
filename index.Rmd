@@ -48,16 +48,34 @@ library(batchtma)
 
 Define example data with batch effects:
 ```{r eval=TRUE}
-df <- data.frame(tma = rep(1:2, times = 30),
-                 biomarker = rep(1:2, times = 30) + runif(max = 3, n = 60))
+df <- data.frame(
+  tma = rep(1:2, times = 30),
+  biomarker = rep(1:2, times = 30) + 
+    runif(max = 3, n = 60)
+)
 ```
 
 Run the `adjust_batch()` function to adjust for batch effects:
 ```{r example, eval=TRUE, fig.show="hold", out.width='40%'}
-df_adjust <- adjust_batch(data = df, markers = biomarker, batch = tma, method = simple)
+df_adjust <- adjust_batch(
+  data = df, 
+  markers = biomarker, 
+  batch = tma, 
+  method = simple
+)
 
-plot_batch(data = df, marker = biomarker, batch = tma, title = "Raw data")
-plot_batch(data = df_adjust, marker = biomarker_adj2, batch = tma, title = "Adjusted data")
+plot_batch(
+  data = df, 
+  marker = biomarker, 
+  batch = tma, 
+  title = "Raw data"
+)
+plot_batch(
+  data = df_adjust, 
+  marker = biomarker_adj2, 
+  batch = tma, 
+  title = "Adjusted data"
+)
 ```
 
 * The ["Get Started"](articles/batchtma.html) vignette has details on how to use the package. 
