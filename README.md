@@ -7,8 +7,6 @@
 
 [![R CMD
 check](https://github.com/stopsack/batchtma/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/stopsack/batchtma/actions/workflows/R-CMD-check.yaml)
-[![Codecov test
-coverage](https://codecov.io/gh/stopsack/batchtma/graph/badge.svg)](https://app.codecov.io/gh/stopsack/batchtma)
 [![CRAN
 status](https://www.r-pkg.org/badges/version/batchtma)](https://CRAN.R-project.org/package=batchtma)
 <!-- badges: end -->
