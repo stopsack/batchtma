@@ -1,421 +1,3 @@
-# as per https://github.com/jennybc/googlesheets/blob/master/R/googlesheets.R:
-## quiets concerns of R CMD check re: the .'s that appear in pipelines
-if (getRversion() >= "2.15.1") utils::globalVariables(c("."))
-
-#' Drop empty factor levels
-#'
-#' @description
-#' Avoids predict() issues. This is \code{forcats::fct_drop()}
-#' without bells and whistles.
-#'
-#' @param f factor
-#'
-#' @return Factor
-#' @noRd
-factor_drop <- function(f) {
-  factor_levels <- levels(f)
-  factor(f, levels = setdiff(factor_levels, factor_levels[table(f) == 0]))
-}
-
-
-#' Batch means for approach 2: Unadjusted means
-#'
-#' @param data Data set
-#' @param markers Biomarkers to adjust
-#'
-#' @importFrom magrittr %>%
-#' @importFrom rlang .data
-#' @return Tibble of means per marker and batch
-#' @noRd
-batchmean_simple <- function(data, markers) {
-  values <- data %>%
-    dplyr::select(.data$.id, .data$.batchvar, {{ markers }}) %>%
-    dplyr::group_by(.data$.batchvar) %>%
-    dplyr::summarize_at(
-      .vars = dplyr::vars(-.data$.id),
-      .funs = mean,
-      na.rm = TRUE
-    ) %>%
-    dplyr::mutate_at(
-      .vars = dplyr::vars(-.data$.batchvar),
-      .funs = ~ . - mean(., na.rm = TRUE)
-    ) %>%
-    tidyr::pivot_longer(
-      col = c(-.data$.batchvar),
-      names_to = "marker",
-      values_to = "batchmean"
-    )
-  return(list(list(values = values, models = NULL)))
-}
-
-#' Batch means for approach 3: Marginal standardization
-#'
-#' @param data Data set
-#' @param markers Vector of variables to batch-adjust
-#' @param confounders Confounders: features that differ
-#'   between batches that should be retained
-#'
-#' @return Tibble with conditional means per marker and batch
-#' @noRd
-batchmean_standardize <- function(data, markers, confounders) {
-  res <- data %>%
-    tidyr::pivot_longer(
-      cols = {{ markers }},
-      names_to = "marker",
-      values_to = "value"
-    ) %>%
-    dplyr::filter(!is.na(.data$value)) %>%
-    dplyr::group_by(.data$marker) %>%
-    tidyr::nest(data = c(-.data$marker)) %>%
-    dplyr::mutate(
-      data = purrr::map(
-        .x = .data$data,
-        .f = ~ .x %>%
-          dplyr::mutate(.batchvar = factor_drop(.data$.batchvar))
-      ),
-      model = purrr::map(
-        .x = .data$data,
-        .f = ~ stats::lm(
-          formula = stats::as.formula(paste0(
-            "value ~ .batchvar +",
-            paste(
-              confounders,
-              collapse = " + ",
-              sep = " + "
-            )
-          )),
-          data = .x
-        )
-      ),
-      .batchvar = purrr::map(
-        .x = .data$data,
-        .f = ~ .x %>%
-          dplyr::pull(.data$.batchvar) %>%
-          levels()
-      )
-    )
-
-  values <- res %>%
-    tidyr::unnest(cols = .data$.batchvar) %>%
-    dplyr::mutate(
-      data = purrr::map2(
-        .x = .data$data,
-        .y = .data$.batchvar,
-        .f = ~ .x %>% dplyr::mutate(.batchvar = .y)
-      ),
-      pred = purrr::map2(.x = .data$model, .y = .data$data, .f = stats::predict)
-    ) %>%
-    dplyr::select(.data$marker, .data$.batchvar, .data$pred) %>%
-    tidyr::unnest(cols = .data$pred) %>%
-    dplyr::group_by(.data$marker, .data$.batchvar) %>%
-    dplyr::summarize(batchmean = mean(.data$pred, na.rm = TRUE)) %>%
-    dplyr::group_by(.data$marker) %>%
-    dplyr::mutate(markermean = mean(.data$batchmean)) %>%
-    dplyr::ungroup() %>%
-    dplyr::transmute(
-      marker = .data$marker,
-      .batchvar = .data$.batchvar,
-      batchmean = .data$batchmean - .data$markermean
-    )
-  return(list(list(
-    models = res %>% dplyr::ungroup() %>% dplyr::pull("model"),
-    values = values
-  )))
-}
-
-#' Batch means for approach 4: IPW
-#'
-#' @param data Data set
-#' @param markers Variables to batch-adjust
-#' @param confounders Confounders: features that differ
-#' @param truncate Lower and upper extreme quantiles to
-#'   truncate stabilized weights at. Defaults to c(0.025, 0.975).
-#'
-#' @return Tibble of batch means per batch and marker
-#' @noRd
-batchmean_ipw <- function(
-  data,
-  markers,
-  confounders,
-  truncate = c(0.025, 0.975)
-) {
-  ipwbatch <- function(data, variable, confounders, truncate) {
-    data <- data %>%
-      dplyr::rename(variable = dplyr::one_of(variable)) %>%
-      dplyr::filter(!is.na(.data$variable)) %>%
-      dplyr::mutate(.batchvar = factor_drop(.data$.batchvar))
-
-    res <- data %>%
-      tidyr::nest(data = dplyr::everything()) %>%
-      dplyr::mutate(
-        num = purrr::map(
-          .x = .data$data,
-          .f = ~ nnet::multinom(
-            formula = .batchvar ~ 1,
-            data = .x,
-            trace = FALSE
-          )
-        ),
-        den = purrr::map(
-          .x = .data$data,
-          .f = ~ nnet::multinom(
-            formula = stats::as.formula(
-              paste(".batchvar ~", confounders)
-            ),
-            data = .x,
-            trace = FALSE
-          )
-        )
-      )
-
-    values <- res %>%
-      dplyr::mutate_at(
-        .vars = dplyr::vars(.data$num, .data$den),
-        .funs = ~ purrr::map(.x = ., .f = stats::predict, type = "probs") %>%
-          purrr::map(.x = ., .f = tibble::as_tibble) %>%
-          purrr::map2(
-            .x = .,
-            .y = .data$data,
-            .f = ~ .x %>%
-              dplyr::mutate(.batchvar = .y %>%
-                purrr::pluck(".batchvar"))
-          )
-      )
-
-    # multinom()$fitted.values is just a vector of probabilities for
-    # the 2nd outcome level if there are only two levels
-    if (length(levels(factor(data$.batchvar))) == 2) {
-      values <- values %>%
-        dplyr::mutate_at(
-          .vars = dplyr::vars(.data$num, .data$den),
-          .funs = ~ purrr::map(.x = ., .f = ~ .x %>%
-            dplyr::mutate(
-              probs = dplyr::if_else(
-                .data$.batchvar ==
-                  levels(factor(.data$.batchvar))[1],
-                true = 1 - .data$value,
-                false = .data$value
-              )
-            ) %>%
-            dplyr::pull(.data$probs))
-        )
-      # otherwise probabilities are a data frame
-    } else {
-      values <- values %>%
-        dplyr::mutate_at(
-          .vars = dplyr::vars(.data$num, .data$den),
-          .funs =
-            ~ purrr::map(
-              .x = .,
-              .f = ~ .x %>%
-                tidyr::pivot_longer(
-                  -.data$.batchvar,
-                  names_to = "batch",
-                  values_to = "prob"
-                ) %>%
-                dplyr::filter(.data$batch == .data$.batchvar) %>%
-                dplyr::pull(.data$prob)
-            )
-        )
-    }
-
-    values <- values %>%
-      tidyr::unnest(cols = c(.data$data, .data$num, .data$den)) %>%
-      dplyr::mutate(
-        sw = .data$num / .data$den,
-        trunc = dplyr::case_when(
-          .data$sw < stats::quantile(.data$sw, truncate[1]) ~
-          stats::quantile(.data$sw, truncate[1]),
-          .data$sw > stats::quantile(.data$sw, truncate[2]) ~
-          stats::quantile(.data$sw, truncate[2]),
-          TRUE ~ .data$sw
-        )
-      )
-
-    xlev <- unique(data %>% dplyr::pull(.data$.batchvar))
-
-    values <- geepack::geeglm(
-      formula = variable ~ .batchvar,
-      data = values,
-      weights = values$trunc,
-      id = values$.id,
-      corstr = "independence"
-    ) %>%
-      broom::tidy() %>%
-      dplyr::filter(!stringr::str_detect(
-        string = .data$term,
-        pattern = "(Intercept)"
-      )) %>%
-      dplyr::mutate(term = as.character(
-        stringr::str_remove_all(
-          string = .data$term,
-          pattern = ".batchvar"
-        )
-      )) %>%
-      dplyr::full_join(tibble::tibble(term = as.character(xlev)), by = "term") %>%
-      dplyr::mutate(
-        estimate = dplyr::if_else(
-          is.na(.data$estimate),
-          true = 0,
-          false = .data$estimate
-        ),
-        estimate = .data$estimate - mean(.data$estimate),
-        marker = variable,
-        term = .data$term
-      ) %>%
-      dplyr::arrange(.data$term) %>%
-      dplyr::select(.data$marker, .batchvar = .data$term, batchmean = .data$estimate)
-    list(values = values, models = res %>% dplyr::pull(.data$den))
-  }
-
-  purrr::map(
-    .x = data %>% dplyr::select({{ markers }}) %>% names(),
-    .f = ipwbatch,
-    data = data %>%
-      dplyr::filter(dplyr::across(dplyr::all_of(confounders), ~ !is.na(.x))),
-    truncate = truncate,
-    confounders = paste(confounders, sep = " + ", collapse = " + ")
-  )
-}
-
-
-#' Quantiles for approach 5: Quantile regression
-#'
-#' @param data Data set
-#' @param variable Single variable to batch-adjust
-#' @param confounders Confounders: features that differ
-#' @param tau Quantiles to use for scaling
-#' @param rq_method Algorithmic method to fit quantile regression.
-#'
-#' @return Tibble of quantiles per batch
-#' @noRd
-batchrq <- function(data, variable, confounders, tau, rq_method) {
-  res <- data %>%
-    dplyr::rename(variable = {{ variable }}) %>%
-    dplyr::filter(!is.na(.data$variable)) %>%
-    dplyr::mutate(.batchvar = factor_drop(.data$.batchvar)) %>%
-    tidyr::nest(data = dplyr::everything()) %>%
-    dplyr::mutate(
-      un = purrr::map(
-        .x = .data$data,
-        .f = ~ quantreg::rq(
-          formula = variable ~ .batchvar,
-          data = .x,
-          tau = tau,
-          method = rq_method
-        )
-      ),
-      ad = purrr::map(
-        .x = .data$data,
-        .f = ~ quantreg::rq(
-          formula = stats::reformulate(
-            response = "variable",
-            termlabels = c(".batchvar", confounders)
-          ),
-          data = .x,
-          tau = tau,
-          method = rq_method
-        )
-      ),
-      .batchvar = purrr::map(
-        .x = .data$data,
-        .f = ~ .x %>%
-          dplyr::pull(.data$.batchvar) %>%
-          levels()
-      )
-    )
-
-  values <- res %>%
-    tidyr::unnest(cols = .data$.batchvar) %>%
-    dplyr::mutate(
-      data = purrr::map2(
-        .x = .data$data,
-        .y = .data$.batchvar,
-        .f = ~ .x %>% dplyr::mutate(.batchvar = .y)
-      ),
-      un = purrr::map2(.x = .data$un, .y = .data$data, .f = stats::predict),
-      ad = purrr::map2(.x = .data$ad, .y = .data$data, .f = stats::predict),
-      un = purrr::map(
-        .x = .data$un,
-        .f = tibble::as_tibble,
-        .name_repair = ~ c("un_lo", "un_hi")
-      ),
-      ad = purrr::map(
-        .x = .data$ad,
-        .f = tibble::as_tibble,
-        .name_repair = ~ c("ad_lo", "ad_hi")
-      ),
-      all_lo = purrr::map_dbl(
-        .x = .data$data,
-        .f = ~ stats::quantile(.x$variable, probs = 0.25)
-      ),
-      all_hi = purrr::map_dbl(
-        .x = .data$data,
-        .f = ~ stats::quantile(.x$variable, probs = 0.75)
-      ),
-      all_iq = .data$all_hi - .data$all_lo
-    ) %>%
-    dplyr::select(
-      .data$.batchvar,
-      .data$un,
-      .data$ad,
-      .data$all_lo,
-      .data$all_hi,
-      .data$all_iq
-    ) %>%
-    tidyr::unnest(cols = c(.data$un, .data$ad)) %>%
-    dplyr::group_by(.data$.batchvar) %>%
-    dplyr::summarize(
-      un_lo = stats::quantile(.data$un_lo, probs = 0.25),
-      ad_lo = stats::quantile(.data$ad_lo, probs = 0.25),
-      un_hi = stats::quantile(.data$un_hi, probs = 0.75),
-      ad_hi = stats::quantile(.data$ad_hi, probs = 0.75),
-      all_lo = stats::median(.data$all_lo),
-      all_iq = stats::median(.data$all_iq)
-    ) %>%
-    dplyr::mutate(
-      un_iq = .data$un_hi - .data$un_lo,
-      ad_iq = .data$ad_hi - .data$ad_lo,
-      marker = {{ variable }}
-    )
-
-  models <- res %>% dplyr::pull(.data$ad)
-  return(tibble::lst(values, models))
-}
-
-#
-#' Helper function for approach 6: Quantile normalize
-#'
-#' @param var Single variable to quantile-normalize
-#' @param batch Variable indicating batch
-#'
-#' @return Tibble of means per batch for one variable
-#' @noRd
-batch_quantnorm <- function(var, batch) {
-  tibble::tibble(var, batch) %>%
-    tibble::rowid_to_column() %>%
-    tidyr::pivot_wider(names_from = batch, values_from = var) %>%
-    dplyr::select(-.data$rowid) %>%
-    dplyr::select_if(~ !all(is.na(.))) %>%
-    as.matrix() %>%
-    limma::normalizeQuantiles() %>%
-    tibble::as_tibble() %>%
-    dplyr::transmute(
-      result = purrr::pmap_dbl(
-        .l = .,
-        .f = function(...) {
-          mean(c(...), na.rm = TRUE)
-        }
-      ),
-      result = dplyr::if_else(
-        is.nan(.data$result),
-        true = NA_real_,
-        false = .data$result
-      )
-    ) %>%
-    dplyr::pull(.data$result)
-}
-
 #' Adjust for batch effects
 #'
 #' @description
@@ -597,20 +179,28 @@ adjust_batch <- function(
 ) {
   method <- as.character(dplyr::enexpr(method))
   allmethods <- c("simple", "standardize", "ipw", "quantreg", "quantnorm")
-  data_orig <- data %>%
+  data_orig <- data |>
     dplyr::mutate(.id = dplyr::row_number())
-  data <- data_orig %>%
-    dplyr::rename(.batchvar = {{ batch }}) %>%
+  data <- data_orig |>
+    dplyr::rename(.batchvar = {{ batch }}) |>
     dplyr::mutate(
       .batchvar = factor(.data$.batchvar),
       .batchvar = factor_drop(.data$.batchvar)
-    ) %>%
-    dplyr::select(.data$.id, .data$.batchvar, {{ markers }}, {{ confounders }})
-  confounders <- data %>%
-    dplyr::select({{ confounders }}) %>%
+    ) |>
+    dplyr::select(".id", ".batchvar", {{ markers }}, {{ confounders }})
+  confounders <- data |>
+    dplyr::select({{ confounders }}) |>
     names()
 
   # Check inputs: method and confounders
+  if(method[1] == "c") {
+    stop(paste0(
+      "No valid argument 'method =' provided. Available methods: ",
+      paste(allmethods, collapse = ", "),
+      ".\n",
+      "See: help(\"adjust_batch\")."
+    ))
+  }
   if (!(method[1] %in% allmethods)) {
     stop(paste0(
       "Method '",
@@ -622,10 +212,13 @@ adjust_batch <- function(
     ))
   }
 
-  if (method %in% c("simple", "quantnorm") &
-    data %>%
-      dplyr::select({{ confounders }}) %>%
-      ncol() > 0) {
+  if (
+    method %in% c("simple", "quantnorm") &
+      data |>
+        dplyr::select({{ confounders }}) |>
+        ncol() >
+        0
+  ) {
     message(paste0(
       "Batch effect correction via 'method = ",
       method,
@@ -634,16 +227,20 @@ adjust_batch <- function(
       paste(dplyr::enexpr(confounders), sep = ", ", collapse = ", "),
       "). They will be ignored."
     ))
-    data <- data %>% dplyr::select(-dplyr::any_of({{ confounders }}))
+    data <- data |> dplyr::select(!dplyr::any_of({{ confounders }}))
     confounders <- NULL
   }
 
   # Mean-based methods
   if (method %in% c("simple", "standardize", "ipw")) {
-    if (method %in% c("standardize", "ipw") &
-      data %>%
-        dplyr::select({{ confounders }}) %>%
-        ncol() == 0) {
+    if (
+      method %in%
+        c("standardize", "ipw") &
+        data |>
+          dplyr::select({{ confounders }}) |>
+          ncol() ==
+          0
+    ) {
       message(paste0(
         "Batch effect correction via 'method = ",
         method,
@@ -668,34 +265,47 @@ adjust_batch <- function(
         truncate = ipw_truncate
       )
     )
-    adjust_parameters <- purrr::map_dfr(.x = res, .f = ~ purrr::pluck(.x, "values"))
+    adjust_parameters <- purrr::map_dfr(
+      .x = res,
+      .f = \(x) purrr::pluck(x, "values")
+    )
     method_indices <- c("simple" = 2, "standardize" = 3, "ipw" = 4)
     if (suffix == "_adjX") {
       suffix <- paste0("_adj", method_indices[method[1]])
     }
 
-    values <- data %>%
-      dplyr::select(-dplyr::any_of({{ confounders }})) %>%
+    values <- data |>
+      dplyr::select(!dplyr::any_of({{ confounders }})) |>
       tidyr::pivot_longer(
-        cols = c(-.data$.id, -.data$.batchvar),
+        cols = !c(".id", ".batchvar"),
         names_to = "marker",
         values_to = "value"
-      ) %>%
-      dplyr::left_join(adjust_parameters, by = c("marker", ".batchvar")) %>%
+      ) |>
+      dplyr::left_join(
+        adjust_parameters,
+        by = c("marker", ".batchvar")
+      ) |>
       dplyr::mutate(
         value_adjusted = .data$value - .data$batchmean,
         marker = paste0(.data$marker, suffix)
-      ) %>%
-      dplyr::select(-.data$batchmean, -.data$value)
+      ) |>
+      dplyr::select(!c("batchmean", "value"))
   }
 
   # Quantile regression
   if (method == "quantreg") {
     res <- purrr::map(
-      .x = data %>% dplyr::select({{ markers }}) %>% names(),
+      .x = data |>
+        dplyr::select({{ markers }}) |>
+        names(),
       .f = batchrq,
-      data = data %>%
-        dplyr::filter(dplyr::across(dplyr::all_of({{ confounders }}), ~ !is.na(.x))),
+      data = data |>
+        dplyr::filter(
+          dplyr::if_all(
+            dplyr::all_of({{ confounders }}),
+            \(x) !is.na(x)
+          )
+        ),
       confounders = dplyr::if_else(
         dplyr::enexpr(confounders) != "",
         true = paste0(
@@ -711,40 +321,52 @@ adjust_batch <- function(
       tau = quantreg_tau,
       rq_method = quantreg_method
     )
-    adjust_parameters <- purrr::map_dfr(.x = res, .f = ~ purrr::pluck(.x, "values"))
+    adjust_parameters <- purrr::map_dfr(
+      .x = res,
+      .f = \(x) purrr::pluck(x, "values")
+    )
     if (suffix == "_adjX") {
       suffix <- "_adj5"
     }
 
-    values <- data %>%
+    values <- data |>
       tidyr::pivot_longer(
-        cols = c(
-          -.data$.id,
-          -.data$.batchvar,
-          -dplyr::any_of({{ confounders }})
+        cols = !c(
+          ".id",
+          ".batchvar",
+          dplyr::any_of({{ confounders }})
         ),
         names_to = "marker",
         values_to = "value"
-      ) %>%
-      dplyr::left_join(adjust_parameters, by = c("marker", ".batchvar")) %>%
-      dplyr::group_by(.data$marker) %>%
+      ) |>
+      dplyr::left_join(
+        adjust_parameters,
+        by = c("marker", ".batchvar")
+      ) |>
+      dplyr::group_by(.data$marker) |>
       dplyr::mutate(
         value_adjusted = (.data$value - .data$un_lo) /
-          .data$un_iq * .data$all_iq * (.data$un_iq / .data$ad_iq) +
-          .data$all_lo - .data$ad_lo + .data$un_lo,
+          .data$un_iq *
+          .data$all_iq *
+          (.data$un_iq / .data$ad_iq) +
+          .data$all_lo -
+          .data$ad_lo +
+          .data$un_lo,
         marker = paste0(.data$marker, suffix)
-      ) %>%
+      ) |>
       dplyr::select(
-        -dplyr::any_of({{ confounders }}),
-        -.data$value,
-        -.data$un_lo,
-        -.data$un_hi,
-        -.data$ad_lo,
-        -.data$ad_hi,
-        -.data$un_iq,
-        -.data$ad_iq,
-        -.data$all_iq,
-        -.data$all_lo
+        !c(
+          dplyr::any_of({{ confounders }}),
+          "value",
+          "un_lo",
+          "un_hi",
+          "ad_lo",
+          "ad_hi",
+          "un_iq",
+          "ad_iq",
+          "all_iq",
+          "all_lo"
+        )
       )
   }
 
@@ -753,45 +375,60 @@ adjust_batch <- function(
     if (suffix == "_adjX") {
       suffix <- "_adj6"
     }
-    values <- data %>%
-      dplyr::select(-dplyr::any_of({{ confounders }})) %>%
+    values <- data |>
+      dplyr::select(!dplyr::any_of({{ confounders }})) |>
       tidyr::pivot_longer(
-        cols = c(-.data$.id, -.data$.batchvar),
+        cols = !c(".id", ".batchvar"),
         names_to = "marker",
         values_to = "value"
-      ) %>%
-      dplyr::mutate(marker = paste0(.data$marker, suffix)) %>%
-      dplyr::group_by(.data$marker) %>%
-      dplyr::mutate(value_adjusted = batch_quantnorm(
-        var = .data$value,
-        batch = .data$.batchvar
-      )) %>%
-      dplyr::ungroup() %>%
-      dplyr::select(-.data$value)
+      ) |>
+      dplyr::mutate(marker = paste0(.data$marker, suffix)) |>
+      dplyr::group_by(.data$marker) |>
+      dplyr::mutate(
+        value_adjusted = batch_quantnorm(
+          var = .data$value,
+          batch = .data$.batchvar
+        )
+      ) |>
+      dplyr::ungroup() |>
+      dplyr::select(!"value")
     res <- list(list(res = NULL, models = NULL))
-    adjust_parameters <- tibble::tibble(marker = data %>%
-      dplyr::select({{ markers }}) %>% names())
+    adjust_parameters <- tibble::tibble(
+      marker = data |>
+        dplyr::select({{ markers }}) |>
+        names()
+    )
   }
 
   # Dataset to return
-  values <- values %>%
+  values <- values |>
     tidyr::pivot_wider(
-      names_from = .data$marker,
-      values_from = .data$value_adjusted
-    ) %>%
-    dplyr::select(-.data$.batchvar) %>%
-    dplyr::left_join(x = data_orig, by = ".id") %>%
-    dplyr::select(-.data$.id)
+      names_from = "marker",
+      values_from = "value_adjusted"
+    ) |>
+    dplyr::select(!".batchvar") |>
+    dplyr::left_join(
+      x = data_orig,
+      by = ".id"
+    ) |>
+    dplyr::select(!".id")
 
   # Meta-data to return as attribute
   attr_list <- list(
     adjust_method = method,
-    markers = data_orig %>% dplyr::select({{ markers }}) %>% names(),
+    markers = data_orig |>
+      dplyr::select({{ markers }}) |>
+      names(),
     suffix = suffix,
-    batchvar = data_orig %>% dplyr::select({{ batch }}) %>% names(),
+    batchvar = data_orig |>
+      dplyr::select({{ batch }}) |>
+      names(),
     confounders = dplyr::enexpr(confounders),
     adjust_parameters = adjust_parameters,
-    model_fits = purrr::map(.x = res, .f = ~ purrr::pluck(.x, "models"))
+    model_fits = purrr::map(
+      .x = res,
+      .f = \(x) purrr::pluck(x, "models")
+    )
   )
   class(attr_list) <- c("batchtma", class(res))
   attr(values, which = ".batchtma") <- attr_list

@@ -73,8 +73,15 @@
 #'   color = confounder
 #' ) +
 #'   ggplot2::labs(y = "Biomarker (variable 'noisy')")
-plot_batch <- function(data, marker, batch, color = NULL, maxlevels = 15, title = NULL, ...) {
-
+plot_batch <- function(
+  data,
+  marker,
+  batch,
+  color = NULL,
+  maxlevels = 15,
+  title = NULL,
+  ...
+) {
   # Set levels to number of discrete entries for `color` or 101 if NULL.
   # If distinct count of `color` is only 1, that indicates NULL was passed.
   nlevels <- dplyr::n_distinct(dplyr::select(data, {{ color }}))
@@ -115,15 +122,20 @@ plot_batch <- function(data, marker, batch, color = NULL, maxlevels = 15, title 
         mapping = ggplot2::aes(color = {{ color }}, shape = {{ color }})
       ) +
       ggplot2::scale_shape_manual(name = dplyr::enexpr(color), values = 15:30) +
-      ggplot2::scale_color_viridis_d(name = dplyr::enexpr(color), option = "cividis")
-  }
-  else {
+      ggplot2::scale_color_viridis_d(
+        name = dplyr::enexpr(color),
+        option = "cividis"
+      )
+  } else {
     myplot +
       ggplot2::geom_jitter(
         width = 0.2,
         height = 0,
         mapping = ggplot2::aes(color = {{ color }})
       ) +
-      ggplot2::scale_color_viridis_c(name = dplyr::enexpr(color), option = "cividis")
+      ggplot2::scale_color_viridis_c(
+        name = dplyr::enexpr(color),
+        option = "cividis"
+      )
   }
 }

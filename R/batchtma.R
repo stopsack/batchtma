@@ -14,7 +14,6 @@
 #'
 #' \code{\link[batchtma]{plot_batch}}: Plot biomarkers by batch
 #'
-#' @docType package
 #' @name batchtma
 #' @seealso \url{https://stopsack.github.io/batchtma/}
 #' @references
@@ -23,5 +22,4 @@
 #' Mucci LA+ (+ equal contribution). Extent, impact, and mitigation of
 #' batch effects in tumor biomarker studies using tissue microarrays.
 #' eLife 2021;10:e71265. doi: https://doi.org/10.7554/elife.71265
-NULL
-# > NULL
+"_PACKAGE"

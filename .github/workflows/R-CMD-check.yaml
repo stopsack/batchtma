@@ -2,11 +2,14 @@ on:
   push:
   pull_request:
     branches:
-      - master
+      - main
   schedule:
-    - cron: '0 8 * * 5'
+    - cron: '0 8 1 * *'
 
 name: R-CMD-check
+
+permissions:
+  contents: write
 
 jobs:
   R-CMD-check:
@@ -21,7 +24,6 @@ jobs:
         config:
         - { os: windows-latest, r: 'release'}
         - { os: macOS-latest, r: 'release'}
-         #- { os: ubuntu-16.04, r: 'release', bioc: 'release', cran: "https://demo.rstudiopm.com/all/__linux__/xenial/latest"}
         - { os: ubuntu-latest, r: 'release'}
 
     env:
@@ -29,6 +31,7 @@ jobs:
       CRAN: ${{ matrix.config.cran }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
     steps:
       - name: Check out repo
@@ -63,7 +66,7 @@ jobs:
 
       - name: Cache R packages
         if: runner.os != 'Windows' && matrix.config.image == null
-        uses: actions/cache@v1
+        uses: actions/cache@v4
         with:
           path: ${{ env.R_LIBS_USER }}
           key: ${{ runner.os }}-r-${{ matrix.config.r }}-bioc-${{ matrix.config.bioc }}-${{ hashFiles('depends.Rds') }}
@@ -101,11 +104,6 @@ jobs:
           BiocCheck::BiocCheck(".")
         shell: Rscript {0}
 
-      - name: Show testthat output
-        if: always()
-        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
-        shell: bash
-
       - name: Upload check results
         if: failure()
         uses: actions/upload-artifact@HEAD
@@ -113,27 +111,56 @@ jobs:
           name: ${{ runner.os }}-r${{ matrix.config.r }}-bioc-${{ matrix.config.bioc }}-results
           path: check
 
-      - name: Test coverage
-        if: matrix.config.os == 'macOS-latest'
-        run: |
-          install.packages("covr")
-          covr::codecov(token = "${{secrets.CODECOV_TOKEN}}")
-        shell: Rscript {0}
-
       - name: pkgdown dependencies
-        if: github.event_name == 'push' && matrix.config.os == 'macOS-latest'
+        if: github.event_name == 'push' && matrix.config.os == 'ubuntu-latest'
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::.
-          needs: website
+          extra-packages: any::pkgdown, local::., any::covr, any::xml2
+          needs: website, coverage
+
+      - name: Test coverage
+        if: github.event_name == 'push' && matrix.config.os == 'ubuntu-latest'
+        run: |
+          cov <- covr::package_coverage(
+            quiet = FALSE,
+            clean = FALSE,
+            install_path = file.path(normalizePath(Sys.getenv("RUNNER_TEMP"), winslash = "/"), "package")
+          )
+          print(cov)
+          covr::to_cobertura(cov)
+        shell: Rscript {0}
+
+      - uses: codecov/codecov-action@v5
+        if: github.event_name == 'push' && matrix.config.os == 'ubuntu-latest'
+        with:
+          # Fail if error if not on PR, or if on PR and token is given
+          fail_ci_if_error: ${{ github.event_name != 'pull_request' || secrets.CODECOV_TOKEN }}
+          files: ./cobertura.xml
+          plugins: noop
+          disable_search: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Show testthat output
+        if: always()
+        run: |
+          ## --------------------------------------------------------------------
+          find '${{ runner.temp }}/package' -name 'testthat.Rout*' -exec cat '{}' \; || true
+        shell: bash
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-test-failures
+          path: ${{ runner.temp }}/package
 
       - name: Build site
-        if: github.event_name == 'push' && matrix.config.os == 'macOS-latest'
+        if: github.event_name == 'push' && matrix.config.os == 'ubuntu-latest'
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
 
       - name: Deploy to GitHub pages 🚀
-        if: github.event_name == 'push' && matrix.config.os == 'macOS-latest'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && matrix.config.os == 'ubuntu-latest'
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           clean: false
