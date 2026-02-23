@@ -45,7 +45,7 @@
 #' More powerful visualizations of batch effects exist
 #' in the BatchQC package:
 #'
-#' \url{http://bioconductor.org/packages/release/bioc/html/BatchQC.html}
+#' \url{https://bioconductor.org/packages/release/bioc/html/BatchQC.html}
 #'
 #' @examples
 #' # Define example data
