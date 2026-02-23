@@ -74,8 +74,9 @@ plot_batch(
 
 <img src="man/figures/index-example-1.png" alt="" width="40%" /><img src="man/figures/index-example-2.png" alt="" width="40%" />
 
-- The [“Get Started”](articles/batchtma.html) vignette has details on
-  how to use the package.
+- The [“Get
+  Started”](https://stopsack.github.io/batchtma/articles/batchtma.html)
+  vignette has details on how to use the package.
 
 ## Methodology
 
@@ -97,8 +98,10 @@ adjustments.
 | 5 | `quantreg` | Quantile regression | Low and high quantiles | Yes |
 | 6 | `quantnorm` | Quantile normalization | All ranks | No |
 
-- [“Get Started”](articles/batchtma.html) shows general examples on the
-  different methods in absence and presence of confounding.
+- [“Get
+  Started”](https://stopsack.github.io/batchtma/articles/batchtma.html)
+  shows general examples on the different methods in absence and
+  presence of confounding.
 
 ## Reference
 
