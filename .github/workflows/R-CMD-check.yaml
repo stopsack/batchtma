@@ -157,12 +157,12 @@ jobs:
           path: ${{ runner.temp }}/package
 
       - name: Build site
-        if: github.event_name == 'push' && matrix.config.os == 'macOS-latest'
+        if: github.event_name == 'push' && matrix.config.os == 'ubuntu-latest'
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
 
       - name: Deploy to GitHub pages 🚀
-        if: github.event_name == 'push' && matrix.config.os == 'macOS-latest'
+        if: github.event_name == 'push' && matrix.config.os == 'ubuntu-latest'
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           clean: false
