@@ -10,7 +10,8 @@ on:
 
 name: R-CMD-check
 
-permissions: read-all
+permissions:
+  contents: write
 
 jobs:
   R-CMD-check:
