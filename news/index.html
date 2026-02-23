@@ -3,7 +3,7 @@
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]--></head><body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-news">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">batchtma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
@@ -34,22 +34,33 @@
       </ul><ul class="nav navbar-nav navbar-right"><li>
   <a href="https://github.com/stopsack/batchtma/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul></div><!--/.nav-collapse -->
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
       <h1 data-toc-skip>Changelog <small></small></h1>
-      <small>Source: <a href="https://github.com/stopsack/batchtma/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
+      <small>Source: <a href="https://github.com/stopsack/batchtma/blob/dev/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.2.0" id="batchtma-020">batchtma 0.2.0<a class="anchor" aria-label="anchor" href="#batchtma-020"></a></h2>
+<ul><li>Braking change: Require R &gt;= 4.1</li>
+<li>No other user-visible changes.</li>
+<li>Internal changes:
+<ul><li>Replace long-deprecated <code>filter(across())</code> with <code><a href="https://dplyr.tidyverse.org/reference/across.html" class="external-link">if_all()</a></code> to be {dplyr} 1.2.0-compatible (<a href="https://github.com/stopsack/batchtma/issues/3" class="external-link">#3</a>, thanks to <a href="https://github.com/DavisVaughan" class="external-link">@DavisVaughan</a>).</li>
+<li>Split code into multiple files.</li>
+<li>Use modern tidyselect, pipe, and anonymous functions.</li>
+<li>Add some unit tests.</li>
+</ul></li>
+</ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.7" id="batchtma-017">batchtma 0.1.7<a class="anchor" aria-label="anchor" href="#batchtma-017"></a></h2>
 <ul><li>Separately call tidyverse packages</li>
@@ -66,7 +77,8 @@
 </ul></div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.4" id="batchtma-014">batchtma 0.1.4<a class="anchor" aria-label="anchor" href="#batchtma-014"></a></h2>
-<ul><li>Bioconductor limma dependency added for `remotes::install_github()``</li>
+<ul><li>Bioconductor limma dependency added for <code><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">remotes::install_github()</a></code>
+</li>
 <li>Code review, updates to curly-curly, and tidyverse style changes, thanks to <a href="https://github.com/tgerke" class="external-link">@tgerke</a></li>
 </ul></div>
     <div class="section level2">
@@ -101,15 +113,15 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer></div>
 
-  
 
 
-  
+
+
 
   </body></html>
 

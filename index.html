@@ -19,7 +19,7 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
-    
+
 
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -33,7 +33,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">batchtma</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.7</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
@@ -53,7 +53,7 @@
 <li>
   <a href="https://github.com/stopsack/batchtma/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
-     
+
   </a>
 </li>
       </ul>
@@ -64,7 +64,7 @@
 </div>
 <!--/.navbar -->
 
-      
+
 
       </header><div class="row">
   <div class="contents col-md-9">
@@ -93,15 +93,33 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stopsack.github.io/batchtma">batchtma</a></span><span class="op">)</span></span></code></pre></div>
 <p>Define example data with batch effects:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>tma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, times <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
-<span>                 biomarker <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, times <span class="op">=</span> <span class="fl">30</span><span class="op">)</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>max <span class="op">=</span> <span class="fl">3</span>, n <span class="op">=</span> <span class="fl">60</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  tma <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, times <span class="op">=</span> <span class="fl">30</span><span class="op">)</span>,</span>
+<span>  biomarker <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, times <span class="op">=</span> <span class="fl">30</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span>max <span class="op">=</span> <span class="fl">3</span>, n <span class="op">=</span> <span class="fl">60</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p>Run the <code><a href="reference/adjust_batch.html">adjust_batch()</a></code> function to adjust for batch effects:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">df_adjust</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/adjust_batch.html">adjust_batch</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df</span>, markers <span class="op">=</span> <span class="va">biomarker</span>, batch <span class="op">=</span> <span class="va">tma</span>, method <span class="op">=</span> <span class="va">simple</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">df_adjust</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/adjust_batch.html">adjust_batch</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">df</span>, </span>
+<span>  markers <span class="op">=</span> <span class="va">biomarker</span>, </span>
+<span>  batch <span class="op">=</span> <span class="va">tma</span>, </span>
+<span>  method <span class="op">=</span> <span class="va">simple</span></span>
+<span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/plot_batch.html">plot_batch</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df</span>, marker <span class="op">=</span> <span class="va">biomarker</span>, batch <span class="op">=</span> <span class="va">tma</span>, title <span class="op">=</span> <span class="st">"Raw data"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/plot_batch.html">plot_batch</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df_adjust</span>, marker <span class="op">=</span> <span class="va">biomarker_adj2</span>, batch <span class="op">=</span> <span class="va">tma</span>, title <span class="op">=</span> <span class="st">"Adjusted data"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/index-example-1.png" width="40%"><img src="reference/figures/index-example-2.png" width="40%"></p>
+<span><span class="fu"><a href="reference/plot_batch.html">plot_batch</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">df</span>, </span>
+<span>  marker <span class="op">=</span> <span class="va">biomarker</span>, </span>
+<span>  batch <span class="op">=</span> <span class="va">tma</span>, </span>
+<span>  title <span class="op">=</span> <span class="st">"Raw data"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/plot_batch.html">plot_batch</a></span><span class="op">(</span></span>
+<span>  data <span class="op">=</span> <span class="va">df_adjust</span>, </span>
+<span>  marker <span class="op">=</span> <span class="va">biomarker_adj2</span>, </span>
+<span>  batch <span class="op">=</span> <span class="va">tma</span>, </span>
+<span>  title <span class="op">=</span> <span class="st">"Adjusted data"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/index-example-1.png" alt="" width="40%"><img src="reference/figures/index-example-2.png" alt="" width="40%"></p>
 <ul>
 <li>The <a href="articles/batchtma.html">“Get Started”</a> vignette has details on how to use the package.</li>
 </ul>
@@ -112,11 +130,11 @@
 <p>The package implements five different approaches to obtaining batch effect-adjusted biomarker values. The methods differ depending on what distributional property of batch effects they address and how they handle “true” between-batch differences. Such differences can result from confounding when batches include samples with different characteristics that are expected to lead to differences in biomarker levels. They should ideally be retained when performing batch effect adjustments.</p>
 <table class="table">
 <colgroup>
-<col width="4%">
-<col width="12%">
-<col width="26%">
 <col width="20%">
-<col width="35%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
 </colgroup>
 <thead><tr class="header">
 <th>#</th>
@@ -211,8 +229,8 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Konrad Stopsack <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-0722-1311" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Travis Gerke <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-9500-8907" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Konrad Stopsack <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-0722-1311" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Travis Gerke <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-9500-8907" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
 </div>
 
@@ -229,16 +247,16 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>
 </div>
 
-  
 
 
-  
+
+
 
   </body>
 </html>

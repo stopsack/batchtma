@@ -1,39 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://stopsack.github.io/batchtma/404.html</loc>
-  </url>
-  <url>
-    <loc>https://stopsack.github.io/batchtma/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://stopsack.github.io/batchtma/articles/batchtma.html</loc>
-  </url>
-  <url>
-    <loc>https://stopsack.github.io/batchtma/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://stopsack.github.io/batchtma/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://stopsack.github.io/batchtma/index.html</loc>
-  </url>
-  <url>
-    <loc>https://stopsack.github.io/batchtma/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://stopsack.github.io/batchtma/reference/adjust_batch.html</loc>
-  </url>
-  <url>
-    <loc>https://stopsack.github.io/batchtma/reference/batchtma.html</loc>
-  </url>
-  <url>
-    <loc>https://stopsack.github.io/batchtma/reference/diagnose_models.html</loc>
-  </url>
-  <url>
-    <loc>https://stopsack.github.io/batchtma/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://stopsack.github.io/batchtma/reference/plot_batch.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://stopsack.github.io/batchtma/404.html</loc></url>
+<url><loc>https://stopsack.github.io/batchtma/LICENSE.html</loc></url>
+<url><loc>https://stopsack.github.io/batchtma/articles/batchtma.html</loc></url>
+<url><loc>https://stopsack.github.io/batchtma/articles/index.html</loc></url>
+<url><loc>https://stopsack.github.io/batchtma/authors.html</loc></url>
+<url><loc>https://stopsack.github.io/batchtma/index.html</loc></url>
+<url><loc>https://stopsack.github.io/batchtma/news/index.html</loc></url>
+<url><loc>https://stopsack.github.io/batchtma/reference/adjust_batch.html</loc></url>
+<url><loc>https://stopsack.github.io/batchtma/reference/batchtma.html</loc></url>
+<url><loc>https://stopsack.github.io/batchtma/reference/diagnose_models.html</loc></url>
+<url><loc>https://stopsack.github.io/batchtma/reference/index.html</loc></url>
+<url><loc>https://stopsack.github.io/batchtma/reference/plot_batch.html</loc></url>
 </urlset>
+
