@@ -1,6 +1,6 @@
 # batchtma 0.2.0
 
-* Braking change: Require R >= 4.1
+* Breaking change: Require R >= 4.1
 * No other user-visible changes.
 * Internal changes:
   + Replace long-deprecated `filter(across())` with `if_all()` to be {dplyr} 
