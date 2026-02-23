@@ -36,8 +36,6 @@ jobs:
     steps:
       - name: Check out repo
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
       - name: Set up R
         uses: r-lib/actions/setup-r@HEAD
@@ -132,11 +130,6 @@ jobs:
           covr::to_cobertura(cov)
         shell: Rscript {0}
 
-      - name: Debug Cobertura XML
-        run: |
-          ls -l cobertura.xml
-          head -n 20 cobertura.xml
-
       - uses: codecov/codecov-action@v5
         if: github.event_name == 'push' && matrix.config.os == 'ubuntu-latest'
         with:
@@ -146,7 +139,6 @@ jobs:
           plugins: noop
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
 
       - name: Show testthat output
         if: always()
